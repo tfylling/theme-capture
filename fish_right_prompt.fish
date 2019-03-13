@@ -66,6 +66,7 @@ end
 function __capture_cmd_duration -d 'Displays the elapsed time of last command'
   switch $pwd_style
     case short long
+      set -l hundredths ''
       set -l seconds ''
       set -l minutes ''
       set -l hours ''
@@ -77,20 +78,23 @@ function __capture_cmd_duration -d 'Displays the elapsed time of last command'
       else
         echo -n (set_color -b $capture_colors[2] $capture_colors[12])' '
       end
-      if [ $CMD_DURATION -lt 10000 ]
-        printf '%d.%02ds ' (expr $CMD_DURATION / 1000) (expr $CMD_DURATION \% 1000)
-      else
-        set -l cmd_duration (expr $CMD_DURATION / 1000)
-        set seconds (expr $cmd_duration \% 68400 \% 3600 \% 60)'s'
-        if [ $cmd_duration -ge 60 ]
-          set minutes (expr $cmd_duration \% 68400 \% 3600 / 60)'m'
-          if [ $cmd_duration -ge 3600 ]
-            set hours (expr $cmd_duration \% 68400 / 3600)'h'
-            if [ $cmd_duration -ge 68400 ]
-              set days (expr $cmd_duration / 68400)'d'
-            end
+      set hundredths (expr $CMD_DURATION / 10 \% 100)
+      if [ $hundredths -lt 10 ]
+        set hundredths '0'$hundredths
+      set -l cmd_duration (expr $CMD_DURATION / 1000)
+      set seconds (expr $cmd_duration \% 68400 \% 3600 \% 60)'s'
+      if [ $cmd_duration -ge 60 ]
+        set minutes (expr $cmd_duration \% 68400 \% 3600 / 60)'m'
+        if [ $cmd_duration -ge 3600 ]
+          set hours (expr $cmd_duration \% 68400 / 3600)'h'
+          if [ $cmd_duration -ge 68400 ]
+            set days (expr $cmd_duration / 68400)'d'
           end
         end
+      end
+      if [ $cmd_duration -lt 10 ]
+        echo -n $seconds'.'$hundredths' '
+      else
         echo -n $days$hours$minutes$seconds' '
       end
       set_color -b $capture_colors[2]
