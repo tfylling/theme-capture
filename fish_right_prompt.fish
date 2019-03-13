@@ -77,7 +77,7 @@ function __capture_cmd_duration -d 'Displays the elapsed time of last command'
       else
         echo -n (set_color -b $capture_colors[2] $capture_colors[12])' '
       end
-      if [ $cmd_duration -lt 10 ]
+      if [ $CMD_DURATION -lt 10 ]
         printf '%d.%02ds ' (expr $CMD_DURATION / 100) (expr $CMD_DURATION \% 100)
       else
         set -l cmd_duration (expr $CMD_DURATION / 1000)
