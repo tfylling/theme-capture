@@ -611,9 +611,6 @@ function __capture_prompt_pwd -d 'Displays the present working directory'
       set user_host " $USER@"(hostname -i)':'
     end
   end
-  set_color $capture_current_bindmode_color
-  echo -n ''
-  set_color normal
   set_color -b $capture_current_bindmode_color $capture_colors[1]
   if [ (count $capture_prompt_error) != 1 ]
     switch $pwd_style
@@ -626,6 +623,9 @@ function __capture_prompt_pwd -d 'Displays the present working directory'
     echo -n " $capture_prompt_error "
     set -e capture_prompt_error[1]
   end
+  set_color normal
+  set_color $capture_current_bindmode_color
+  echo -n ''
   set_color normal
 end
 
