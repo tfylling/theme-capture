@@ -147,15 +147,15 @@ function __capture_prompt_git_symbols -d 'Displays the git symbols'
           end
           if [ $git_status[1] -gt 0 ]
             set_color -o $capture_colors[12]
-            echo -n ' +'
+            echo -n ' 落'
           end
           if [ $git_status[2] -gt 0 ]
             set_color -o $capture_colors[7]
-            echo -n ' –'
+            echo -n ' '
           end
           if [ $git_status[3] -gt 0 ]
             set_color -o $capture_colors[10]
-            echo -n ' ✱'
+            echo -n ' '
           end
           if [ $git_status[4] -gt 0 ]
             set_color -o $capture_colors[8]
@@ -171,7 +171,7 @@ function __capture_prompt_git_symbols -d 'Displays the git symbols'
           end
           if [ $git_stashed -gt 0 ]
             set_color -o $capture_colors[11]
-            echo -n ' ✭'
+            echo -n ' '
           end
         else
           if [ $git_ahead_behind[1] -gt 0 ]
@@ -227,9 +227,9 @@ function __capture_prompt_git_branch -d 'Return the current branch name'
         set_color -b $capture_colors[11]
         switch $pwd_style
           case short long
-            echo -n ''(set_color $capture_colors[1])' ➦ '$commit' '(set_color $capture_colors[11])
+            echo -n ''(set_color $capture_colors[1])' ➦ '$commit' '(set_color $capture_colors[11])
           case none
-            echo -n ''
+            echo -n ''
         end
         set_color normal
         set_color $capture_colors[11]
@@ -238,9 +238,9 @@ function __capture_prompt_git_branch -d 'Return the current branch name'
       set_color -b $capture_colors[9]
       switch $pwd_style
         case short long
-          echo -n ''(set_color $capture_colors[1])'  '$position' '(set_color $capture_colors[9])
+          echo -n ''(set_color $capture_colors[1])'  '$position' '(set_color $capture_colors[9])
         case none
-          echo -n ''
+          echo -n ''
       end
       set_color normal
       set_color $capture_colors[9]
@@ -249,9 +249,9 @@ function __capture_prompt_git_branch -d 'Return the current branch name'
     set_color -b $capture_colors[3]
     switch $pwd_style
       case short long
-        echo -n ''(set_color $capture_colors[1])'  '$branch' '(set_color $capture_colors[3])
+        echo -n ''(set_color $capture_colors[1])'  '$branch' '(set_color $capture_colors[3])
       case none
-        echo -n ''
+        echo -n ''
     end
     set_color normal
     set_color $capture_colors[3]

@@ -625,6 +625,7 @@ function __capture_prompt_pwd -d 'Displays the present working directory'
   end
   set_color normal
   set_color $capture_current_bindmode_color
+  set_color -b $capture_colors[2]
   echo -n ''
   set_color normal
 end
