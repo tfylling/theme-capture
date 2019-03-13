@@ -80,13 +80,13 @@ function __capture_cmd_duration -d 'Displays the elapsed time of last command'
         end
     end
     set_color $capture_colors[2]
-    echo -n ''
+    echo -n ''
     switch $pwd_style
       case short long
         if [ $last_status -ne 0 ]
-          echo -n (set_color -b $capture_colors[2] $capture_colors[7])' '$days$hours$minutes$seconds' '
+          echo -n (set_color -b $capture_colors[2] $capture_colors[7])' '$days$hours$minutes$seconds' '
         else
-          echo -n (set_color -b $capture_colors[2] $capture_colors[12])' '$days$hours$minutes$seconds' '
+          echo -n (set_color -b $capture_colors[2] $capture_colors[12])' '$days$hours$minutes$seconds' '
         end
     end
   set_color -b $capture_colors[2]
