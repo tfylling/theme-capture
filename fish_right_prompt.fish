@@ -81,6 +81,7 @@ function __capture_cmd_duration -d 'Displays the elapsed time of last command'
       set hundredths (expr $CMD_DURATION / 10 \% 100)
       if [ $hundredths -lt 10 ]
         set hundredths '0'$hundredths
+      end
       set -l cmd_duration (expr $CMD_DURATION / 1000)
       set seconds (expr $cmd_duration \% 68400 \% 3600 \% 60)'s'
       if [ $cmd_duration -ge 60 ]
