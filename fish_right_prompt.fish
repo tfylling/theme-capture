@@ -83,7 +83,7 @@ function __capture_cmd_duration -d 'Displays the elapsed time of last command'
         set hundredths '0'$hundredths
       end
       set -l cmd_duration (expr $CMD_DURATION / 1000)
-      set seconds (expr $cmd_duration \% 68400 \% 3600 \% 60)'s'
+      set seconds (expr $cmd_duration \% 68400 \% 3600 \% 60)
       if [ $cmd_duration -ge 60 ]
         set minutes (expr $cmd_duration \% 68400 \% 3600 / 60)'m'
         if [ $cmd_duration -ge 3600 ]
@@ -96,7 +96,7 @@ function __capture_cmd_duration -d 'Displays the elapsed time of last command'
       if [ $cmd_duration -lt 10 ]
         echo -n $seconds'.'$hundredths' '
       else
-        echo -n $days$hours$minutes$seconds' '
+        echo -n $days$hours$minutes$seconds's '
       end
       set_color -b $capture_colors[2]
   end
