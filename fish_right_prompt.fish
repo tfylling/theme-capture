@@ -94,7 +94,7 @@ function __capture_cmd_duration -d 'Displays the elapsed time of last command'
         end
       end
       if [ $cmd_duration -lt 10 ]
-        echo -n $seconds'.'$hundredths' '
+        echo -n $seconds'.'$hundredths's '
       else
         echo -n $days$hours$minutes$seconds's '
       end
