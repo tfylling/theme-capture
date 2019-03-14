@@ -786,8 +786,8 @@ function __capture_prompt_git_branch -d 'Return the current branch name'
     set -g capture_color_bg_next $capture_color_bg_git_branch
     set_color $capture_color_fg_git_branch
     echo -n '  '$branch
-  __capture_prompt_git_symbols
   end
+  __capture_prompt_git_symbols
 end
 
 ######################
