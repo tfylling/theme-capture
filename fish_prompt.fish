@@ -38,7 +38,10 @@
 # Define colors
 set -U capture_color_fg_dark 000000
 set -U capture_color_fg_light fdf6e3
-set -U capture_color_bg_theme_primary 2990b5
+if [ $USER = 'root' ]
+  set -U capture_color_bg_theme_primary bd4b43
+else
+  set -U capture_color_bg_theme_primary 2990b5
 set -U capture_color_fg_theme_primary $capture_color_fg_dark
 set -U capture_color_bg_theme_secondary 083743
 set -U capture_color_fg_theme_secondary $capture_color_fg_light
@@ -764,6 +767,7 @@ function __capture_prompt_git_symbols -d 'Displays the git symbols'
       echo -n '  '$git_stashed' '
     end
   end
+  echo ' '
 end
 
 function __capture_prompt_git_branch -d 'Return the current branch name'
@@ -780,7 +784,8 @@ function __capture_prompt_git_branch -d 'Return the current branch name'
     else
       set -g capture_color_bg_next $capture_color_bg_git_position
       set_color $capture_color_fg_git_position
-      echo -n '  '$position
+      set -l position (echo -n $position | sed -e 's|tags/| |')
+      echo -n ' '$position
     end
   else
     set -g capture_color_bg_next $capture_color_bg_git_branch
@@ -823,130 +828,66 @@ end
 ####################
 # => Symbols segment
 ####################
-function __capture_prompt_left_symbols -d 'Display symbols'
-    set -l symbols_urgent 'F'
-    #set -l symbols (set_color -b $capture_colors[2])''
+function __capture_prompt_symbols -d 'Display symbols'
+  set -g capture_color_bg_next $capture_color_bg_theme_secondary
+  set -l jobs (jobs | wc -l | tr -d '[:space:]')
+  if [ -e ~/.taskrc ]
+    set todo (task due.before:sunday 2> /dev/null | tail -1 | cut -f1 -d' ')
+    set overdue (task due.before:today 2> /dev/null | tail -1 | cut -f1 -d' ')
+  end
+  if [ -e ~/.reminders ]
+    set appointments (rem -a | cut -f1 -d' ')
+  end
+  if [ (count $todo) -eq 0 ]
+    set todo 0
+  end
+  if [ (count $overdue) -eq 0 ]
+    set overdue 0
+  end
+  if [ (count $appointments) -eq 0 ]
+    set appointments 0
+  end
 
-    set -l jobs (jobs | wc -l | tr -d '[:space:]')
-    if [ -e ~/.taskrc ]
-        set todo (task due.before:sunday 2> /dev/null | tail -1 | cut -f1 -d' ')
-        set overdue (task due.before:today 2> /dev/null | tail -1 | cut -f1 -d' ')
-    end
-    if [ -e ~/.reminders ]
-        set appointments (rem -a | cut -f1 -d' ')
-    end
-    if [ (count $todo) -eq 0 ]
-        set todo 0
-    end
-    if [ (count $overdue) -eq 0 ]
-        set overdue 0
-    end
-    if [ (count $appointments) -eq 0 ]
-        set appointments 0
-    end
-
-    if [ $symbols_style = 'symbols' ]
-        if [ $capture_session_current != '' ]
-            set symbols $symbols(set_color -o $capture_colors[8])' ✻'
-            set symbols_urgent 'T'
-        end
-        if contains $PWD $bookmarks
-            set symbols $symbols(set_color -o $capture_colors[10])' ⌘'
-        end
-        if set -q -x VIM
-            set symbols $symbols(set_color -o $capture_colors[9])' V'
-            set symbols_urgent 'T'
-        end
-        if set -q -x RANGER_LEVEL
-            set symbols $symbols(set_color -o $capture_colors[9])' R'
-            set symbols_urgent 'T'
-        end
-        if [ $jobs -gt 0 ]
-            set symbols $symbols(set_color -o $capture_colors[11])' ⚙'
-            set symbols_urgent 'T'
-        end
-        if [ ! -w . ]
-            set symbols $symbols(set_color -o $capture_colors[6])' '
-        end
-        if [ $todo -gt 0 ]
-            set symbols $symbols(set_color -o $capture_colors[4])
-        end
-        if [ $overdue -gt 0 ]
-            set symbols $symbols(set_color -o $capture_colors[8])
-        end
-        if [ (expr $todo + $overdue) -gt 0 ]
-            set symbols $symbols' ⚔'
-            set symbols_urgent 'T'
-        end
-        if [ $appointments -gt 0 ]
-            set symbols $symbols(set_color -o $capture_colors[5])' ⚑'
-            set symbols_urgent 'T'
-        end
-        if [ $last_status -eq 0 ]
-            set symbols $symbols(set_color -o $capture_colors[12])' ✔'
-        else
-            set symbols $symbols(set_color -o $capture_colors[7])' ✘'
-        end
-        if [ $USER = 'root' ]
-            set symbols $symbols(set_color -o $capture_colors[6])' ⚡'
-            set symbols_urgent 'T'
-        end
-    else
-        if [ $capture_session_current != '' ] 2> /dev/null
-            set symbols $symbols(set_color $capture_colors[8])' '(expr (count $capture_sessions) - (contains -i $capture_session_current $capture_sessions))
-            set symbols_urgent 'T'
-        end
-        if contains $PWD $bookmarks
-            set symbols $symbols(set_color $capture_colors[10])' '(expr (count $bookmarks) - (contains -i $PWD $bookmarks))
-        end
-        if set -q -x VIM
-            set symbols $symbols(set_color -o $capture_colors[9])' V'(set_color normal)(set_color -b $capture_colors[2])
-            set symbols_urgent 'T'
-        end
-        if set -q -x RANGER_LEVEL
-            set symbols $symbols(set_color $capture_colors[9])' '$RANGER_LEVEL
-            set symbols_urgent 'T'
-        end
-        if [ $jobs -gt 0 ]
-            set symbols $symbols(set_color $capture_colors[11])' '$jobs
-            set symbols_urgent 'T'
-        end
-        if [ ! -w . ]
-            set symbols $symbols(set_color -o $capture_colors[6])' '(set_color normal)(set_color -b $capture_colors[2])
-        end
-        if [ $todo -gt 0 ]
-            set symbols $symbols(set_color $capture_colors[4])
-        end
-        if [ $overdue -gt 0 ]
-            set symbols $symbols(set_color $capture_colors[8])
-        end
-        if [ (expr $todo + $overdue) -gt 0 ]
-            set symbols $symbols" $todo"
-            set symbols_urgent 'T'
-        end
-        if [ $appointments -gt 0 ]
-            set symbols $symbols(set_color $capture_colors[5])" $appointments"
-            set symbols_urgent 'T'
-        end
-        if [ $last_status -eq 0 ]
-            set symbols $symbols(set_color $capture_colors[12])' '$last_status
-        else
-            set symbols $symbols(set_color $capture_colors[7])' '$last_status
-        end
-        if [ $USER = 'root' ]
-            set symbols $symbols(set_color -o $capture_colors[6])' ⚡'
-            set symbols_urgent 'T'
-        end
-    end
-    set symbols $symbols(set_color $capture_colors[2])' '(set_color normal)(set_color $capture_colors[2])
-    switch $pwd_style
-        case none
-            if test $symbols_urgent = 'T'
-                set symbols (set_color -b $capture_colors[2])''(set_color normal)(set_color $capture_colors[2])
-            else
-                set symbols ''
-            end
-    end
+  if [ $capture_session_current != '' ]
+    set symbols $symbols(set_color -o $capture_colors[8])' ✻'
+  end
+  if contains $PWD $bookmarks
+    set symbols $symbols(set_color -o $capture_colors[10])' ⌘'
+  end
+  if set -q -x VIM
+    set symbols $symbols(set_color -o $capture_colors[9])' V'
+  end
+  if set -q -x RANGER_LEVEL
+    set symbols $symbols(set_color -o $capture_colors[9])' R'
+  end
+  if [ $jobs -gt 0 ]
+    set symbols $symbols(set_color -o $capture_colors[11])' ⚙'
+  end
+  if [ ! -w . ]
+    set symbols $symbols(set_color -o $capture_colors[6])' '
+  end
+  if [ $todo -gt 0 ]
+    set symbols $symbols(set_color -o $capture_colors[4])
+  end
+  if [ $overdue -gt 0 ]
+    set symbols $symbols(set_color -o $capture_colors[8])
+  end
+  if [ (expr $todo + $overdue) -gt 0 ]
+    set symbols $symbols' ⚔'
+  end
+  if [ $appointments -gt 0 ]
+    set symbols $symbols(set_color -o $capture_colors[5])' ⚑'
+  end
+  if [ $last_status -eq 0 ]
+    set symbols $symbols(set_color -o $capture_colors[12])' ✔'
+  else
+    set symbols $symbols(set_color -o $capture_colors[7])' ✘'
+  end
+  if [ $USER = 'root' ]
+    set symbols $symbols(set_color -o $capture_colors[6])' ⚡'
+  end
+  set symbols $symbols(set_color $capture_colors[2])' '(set_color normal)(set_color $capture_colors[2])
+  switch $pwd_style
     echo -n $symbols
 end
 
@@ -1017,10 +958,8 @@ function fish_prompt -d 'Write out the left prompt of the capture theme'
   set -g last_status $status
   set -g capture_first_segment 1
   echo -n -s (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
-             (__capture_append_left_prompt_segment (__capture_cmd_duration)) \
              (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
-             (__capture_append_left_prompt_segment (__capture_cmd_duration)) \
-             (__capture_append_left_prompt_segment (__capture_prompt_left_symbols)) \
+             (__capture_append_left_prompt_segment (__capture_prompt_lsymbols)) \
              (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
   #echo -n -s (__capture_prompt_bindmode) (__capture_prompt_virtual_env) (__capture_prompt_pwd) (__capture_prompt_left_symbols) ' ' (set_color normal)
 end
