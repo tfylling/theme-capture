@@ -586,7 +586,7 @@ end
 # => Append left prompt segment
 ###############################
 function __capture_append_left_prompt_segment -d 'Append a segment to the left prompt'
-  if [ $capture_first_segment -eq 1 ]
+  if [ $capture_first_segment -gt 0 ]
     set_color $capture_color_bg_next
     set_color -r
     echo ''
@@ -878,11 +878,9 @@ set -x LOGIN $USER
 function fish_prompt -d 'Write out the left prompt of the capture theme'
   set -g last_status $status
   set -g first_segment 1
-  echo -n -s (__capture_append_left_prompt_segment (__capture_prompt_pwd))
-#             (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
-#  echo -n -s (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
-#             (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
-#             (__capture_append_left_prompt_segment (__capture_prompt_left_symbols)) \
-#             (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
+  echo -n -s (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
+             (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
+             (__capture_append_left_prompt_segment (__capture_prompt_left_symbols)) \
+             (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
   #echo -n -s (__capture_prompt_bindmode) (__capture_prompt_virtual_env) (__capture_prompt_pwd) (__capture_prompt_left_symbols) ' ' (set_color normal)
 end
