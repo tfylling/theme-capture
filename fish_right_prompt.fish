@@ -32,45 +32,6 @@ if not test (uname) = Darwin
   end
 end
 
-#############################
-# => Command duration segment
-#############################
-function __capture_cmd_duration -d 'Displays the elapsed time of last command'
-  set_color $capture_colors[2]
-  echo -n ''
-  set -l hundredths ''
-  set -l seconds ''
-  set -l minutes ''
-  set -l hours ''
-  set -l days ''
-  if [ $last_status -ne 0 ]
-    echo -n (set_color -b $capture_colors[2] $capture_colors[7])'  '
-  else
-    echo -n (set_color -b $capture_colors[2] $capture_colors[12])'  '
-  end
-  set hundredths (expr $CMD_DURATION / 10 \% 100)
-  if [ $hundredths -lt 10 ]
-    set hundredths '0'$hundredths
-  end
-  set -l cmd_duration (expr $CMD_DURATION / 1000)
-  set seconds (expr $cmd_duration \% 68400 \% 3600 \% 60)
-  if [ $cmd_duration -ge 60 ]
-    set minutes (expr $cmd_duration \% 68400 \% 3600 / 60)'m'
-    if [ $cmd_duration -ge 3600 ]
-      set hours (expr $cmd_duration \% 68400 / 3600)'h'
-      if [ $cmd_duration -ge 68400 ]
-        set days (expr $cmd_duration / 68400)'d'
-      end
-    end
-  end
-  if [ $cmd_duration -lt 10 ]
-    echo -n $seconds'.'$hundredths's '
-  else
-    echo -n $days$hours$minutes$seconds's '
-  end
-  set_color -b $capture_colors[2]
-end
-
 ################
 # => Git segment
 ################
@@ -186,18 +147,13 @@ function __capture_prompt_git_branch -d 'Return the current branch name'
   end
 end
 
-function __capture_prompt_git -d 'Join branch and symbols'
-    set_color $capture_colors[3]
-    echo -n ''
-    set_color -b $capture_colors[3]
-
-end
-
 ###############################################################################
 # => Prompt
 ###############################################################################
 
 function fish_right_prompt -d 'Write out the right prompt of the capture theme'
-  echo -n -s (__capture_cmd_duration) (__capture_prompt_git_branch) (__capture_prompt_git_symbols)
+#  echo -n -s (__capture_append_left_prompt_segment ()) \
+#             (__capture_append_left_prompt_segment ()) \
+  echo -n -s (__capture_prompt_git_branch) (__capture_prompt_git_symbols)
   set_color normal
 end

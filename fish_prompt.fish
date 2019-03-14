@@ -587,10 +587,10 @@ end
 ###############################
 function __capture_append_left_prompt_segment -d 'Append a segment to the left prompt'
   if [ $capture_first_segment -eq 0 ]
-    #set_color $capture_color_bg_next
-    #set_color -r
+    set_color $capture_color_bg_next
+    set_color -r
     echo ''
-    #set_color normal
+    set_color normal
   end
   set_color -b $capture_color_bg_next
   echo $argv
@@ -649,6 +649,44 @@ function __capture_prompt_pwd -d 'Displays the present working directory'
   else
     echo -n " $capture_prompt_error "
     set -e capture_prompt_error[1]
+  end
+end
+
+#############################
+# => Command duration segment
+#############################
+function __capture_cmd_duration -d 'Displays the elapsed time of last command'
+  set -g capture_color_bg_next $capture_color_bg_theme_secondary
+  set -l hundredths ''
+  set -l seconds ''
+  set -l minutes ''
+  set -l hours ''
+  set -l days ''
+  set -l hundredths (expr $CMD_DURATION / 10 \% 100)
+  if [ $hundredths -lt 10 ]
+    set -l hundredths '0'$hundredths
+  end
+  set -l cmd_duration (expr $CMD_DURATION / 1000)
+  set -l seconds (expr $cmd_duration \% 68400 \% 3600 \% 60)
+  if [ $cmd_duration -ge 60 ]
+    set -l minutes (expr $cmd_duration \% 68400 \% 3600 / 60)'m'
+    if [ $cmd_duration -ge 3600 ]
+      set hours (expr $cmd_duration \% 68400 / 3600)'h'
+      if [ $cmd_duration -ge 68400 ]
+        set -l days (expr $cmd_duration / 68400)'d'
+      end
+    end
+  end
+  if [ $last_status -ne 0 ]
+    set_color $capture_color_fg_ok_text
+  else
+    set_color $capture_color_fg_error_text
+  end
+  echo -n '  '
+  if [ $cmd_duration -lt 10 ]
+    echo -n $seconds'.'$hundredths's '
+  else
+    echo -n $days$hours$minutes$seconds's '
   end
 end
 
@@ -879,7 +917,9 @@ function fish_prompt -d 'Write out the left prompt of the capture theme'
   set -g last_status $status
   set -g capture_first_segment 1
   echo -n -s (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
+             (__capture_append_left_prompt_segment (__capture_cmd_duration)) \
              (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
+             (__capture_append_left_prompt_segment (__capture_cmd_duration)) \
              (__capture_append_left_prompt_segment (__capture_prompt_left_symbols)) \
              (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
   #echo -n -s (__capture_prompt_bindmode) (__capture_prompt_virtual_env) (__capture_prompt_pwd) (__capture_prompt_left_symbols) ' ' (set_color normal)
