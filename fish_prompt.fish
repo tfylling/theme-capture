@@ -53,7 +53,7 @@ set -U capture_color_fg_git_tag $capture_color_fg_dark
 set -U capture_color_bg_virtual_env 268bd2
 set -U capture_color_fg_virtual_env $capture_color_fg_dark
 
-set -U capture_color_bg_next $capture_color_bg_theme_primary
+#set -U capture_color_bg_next $capture_color_bg_theme_primary
 
 set -U capture_night 000000 083743 445659 fdf6e3 2990b5 cb4b16 dc121f af005f 6c71c4 268bd2 2aa198 859900
 #                    0      1      2      3      4      5      6      7      8      9      10     11
@@ -586,15 +586,16 @@ end
 # => Append left prompt segment
 ###############################
 function __capture_append_left_prompt_segment -d 'Append a segment to the left prompt'
-  if set -q capture_color_bg_last
+  if [ $capture_first_segment -eq 1 ]
     set_color $capture_color_bg_next
     set_color -r
     echo ''
     set_color normal
+    set -l $capture_first_segment 0
   end
   set_color -b $capture_color_bg_next
   echo $argv
-  set -U capture_color_bg_last $capture_color_bg_next
+  set -g capture_color_bg_last $capture_color_bg_next
 end
 
 ################################
@@ -613,7 +614,7 @@ end
 ########################
 function __capture_prompt_virtual_env -d 'Return the current virtual env name'
   if set -q VIRTUAL_ENV
-    set -U capture_color_bg_next $capture_color_bg_virtual_env
+    set -g capture_color_bg_next $capture_color_bg_virtual_env
     set_color $capture_color_fg_virtual_env
     echo -n ' '(basename "$VIRTUAL_ENV")' '
   end
@@ -623,7 +624,7 @@ end
 # => PWD segment
 ################
 function __capture_prompt_pwd -d 'Displays the present working directory'
-  set -U capture_color_bg_next $capture_color_bg_theme_primary
+  set -g capture_color_bg_next $capture_color_bg_theme_primary
   set_color $capture_color_fg_theme_primary
   set -l user_host ' '
   if set -q SSH_CLIENT
@@ -876,6 +877,7 @@ set -x LOGIN $USER
 
 function fish_prompt -d 'Write out the left prompt of the capture theme'
   set -g last_status $status
+  set -l first_segment 1
   echo -n -s (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
              (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
              (__capture_append_left_prompt_segment (__capture_prompt_left_symbols)) \
