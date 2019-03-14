@@ -878,9 +878,11 @@ set -x LOGIN $USER
 function fish_prompt -d 'Write out the left prompt of the capture theme'
   set -g last_status $status
   set -g first_segment 1
+  set -xg DEBUG 1
   echo -n -s (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
              (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
              (__capture_append_left_prompt_segment (__capture_prompt_left_symbols)) \
              (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
+  set -e DEBUG
   #echo -n -s (__capture_prompt_bindmode) (__capture_prompt_virtual_env) (__capture_prompt_pwd) (__capture_prompt_left_symbols) ' ' (set_color normal)
 end
