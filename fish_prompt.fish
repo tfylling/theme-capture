@@ -15,7 +15,6 @@
 #   -> Functions
 #     -> Ring bell
 #     -> Window title
-#     -> Help
 #     -> Environment
 #     -> Pre execute
 #     -> Directory history
@@ -106,23 +105,6 @@ function wt -d 'Set window title'
   set -g window_title $argv
   function fish_title
     echo -n $window_title
-  end
-end
-
-#########
-# => Help
-#########
-function capture_help -d 'Show helpfile'
-  set -l readme_file "$OMF_PATH/themes/capture/README.md"
-  if set -q PAGER
-    if [ -e $readme_file ]
-      eval $PAGER $readme_file
-      else
-        set_color $fish_color_error[1]
-        echo "$readme_file wasn't found."
-      end
-  else
-    open $readme_file
   end
 end
 
