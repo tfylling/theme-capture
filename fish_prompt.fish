@@ -46,10 +46,12 @@ set -U capture_color_fg_ok_text 859900
 set -U capture_color_fg_error_text dc121f
 set -U capture_color_bg_error_segment dc121f
 set -U capture_color_fg_error_segment $capture_color_fg_dark
-set -U capture_color_bg_git_main 445659
-set -U capture_color_fg_git_main $capture_color_fg_dark
-set -U capture_color_bg_git_tag 6c71c4
-set -U capture_color_fg_git_tag $capture_color_fg_dark
+set -U capture_color_bg_git_commit 2aa198
+set -U capture_color_fg_git_commit $capture_color_fg_dark
+set -U capture_color_bg_git_position 6c71c4
+set -U capture_color_fg_git_position $capture_color_fg_dark
+set -U capture_color_bg_git_branch 445659
+set -U capture_color_fg_git_branch $capture_color_fg_light
 set -U capture_color_bg_virtual_env 268bd2
 set -U capture_color_fg_virtual_env $capture_color_fg_dark
 
@@ -678,15 +680,113 @@ function __capture_cmd_duration -d 'Displays the elapsed time of last command'
     end
   end
   if [ $last_status -ne 0 ]
-    set_color $capture_color_fg_ok_text
-  else
     set_color $capture_color_fg_error_text
+  else
+    set_color $capture_color_fg_ok_text
   end
   echo -n '  '
   if [ $cmd_duration -lt 10 ]
     echo -n $seconds'.'$hundredths's '
   else
     echo -n $days$hours$minutes$seconds's '
+  end
+end
+
+################
+# => Git segment
+################
+function __capture_is_git_ahead_or_behind -d 'Check if there are unpulled or unpushed commits'
+  if set -l ahead_or_behind (command git rev-list --count --left-right 'HEAD...@{upstream}' 2> /dev/null)
+    echo $ahead_or_behind | sed 's|\s\+|\n|g'
+  else
+    echo 0\n0
+  end
+end
+
+function __capture_git_status -d 'Check git status'
+  set -l git_status (command git status --porcelain 2> /dev/null | cut -c 1-2)
+  set -l added (echo -sn $git_status\n | egrep -c "[ACDMT][ MT]|[ACMT]D")
+  set -l deleted (echo -sn $git_status\n | egrep -c "[ ACMRT]D")
+  set -l modified (echo -sn $git_status\n | egrep -c ".[MT]")
+  set -l renamed (echo -sn $git_status\n | egrep -c "R.")
+  set -l unmerged (echo -sn $git_status\n | egrep -c "AA|DD|U.|.U")
+  set -l untracked (echo -sn $git_status\n | egrep -c "\?\?")
+  echo -n $added\n$deleted\n$modified\n$renamed\n$unmerged\n$untracked
+end
+
+function __capture_is_git_stashed -d 'Check if there are stashed commits'
+  command git log --format="%gd" -g $argv 'refs/stash' -- 2> /dev/null | wc -l | tr -d '[:space:]'
+end
+
+function __capture_prompt_git_symbols -d 'Displays the git symbols'
+  set -l is_repo (command git rev-parse --is-inside-work-tree 2> /dev/null)
+  if [ -z $is_repo ]
+    return
+  end
+  set -l git_ahead_behind (__capture_is_git_ahead_or_behind)
+  set -l git_status (__capture_git_status)
+  set -l git_stashed (__capture_is_git_stashed)
+  if [ (expr $git_ahead_behind[1] + $git_ahead_behind[2] + $git_status[1] + $git_status[2] + $git_status[3] + $git_status[4] + $git_status[5] + $git_status[6] + $git_stashed) -ne 0 ]
+    if [ $git_ahead_behind[1] -gt 0 ]
+      set_color -o $capture_colors[5]
+      echo -n ' ↑ '$git_ahead_behind[1]' '
+    end
+    if [ $git_ahead_behind[2] -gt 0 ]
+      set_color -o $capture_colors[5]
+      echo -n ' ↓ '$git_ahead_behind[2]' '
+    end
+    if [ $git_status[1] -gt 0 ]
+      set_color -o $capture_colors[12]
+      echo -n ' 落'$git_status[1]' '
+    end
+    if [ $git_status[2] -gt 0 ]
+      set_color -o $capture_colors[7]
+      echo -n '  '$git_status[2]' '
+    end
+    if [ $git_status[3] -gt 0 ]
+      set_color -o $capture_colors[10]
+      echo -n '  '$git_status[3]' '
+    end
+    if [ $git_status[4] -gt 0 ]
+      set_color -o $capture_colors[8]
+      echo -n ' → '$git_status[4]' '
+    end
+    if [ $git_status[5] -gt 0 ]
+      set_color -o $capture_colors[9]
+      echo -n ' ═ '$git_status[5]' '
+    end
+    if [ $git_status[6] -gt 0 ]
+      set_color -o $capture_colors[4]
+      echo -n ' ● '$git_status[6]' '
+    end
+    if [ $git_stashed -gt 0 ]
+      set_color -o $capture_colors[11]
+      echo -n '  '$git_stashed' '
+    end
+  end
+end
+
+function __capture_prompt_git_branch -d 'Return the current branch name'
+  set -l branch (command git symbolic-ref HEAD 2> /dev/null | sed -e 's|^refs/heads/||')
+  if not test $branch > /dev/null
+    set -l position (command git describe --contains --all HEAD 2> /dev/null)
+    if not test $position > /dev/null
+      set -l commit (command git rev-parse HEAD 2> /dev/null | sed 's|\(^.......\).*|\1|')
+      if test $commit
+        set -g capture_color_bg_next $capture_color_bg_git_commit
+        set_color $capture_color_fg_git_commit
+        echo -n ' ➦ '$commit
+      end
+    else
+      set -g capture_color_bg_next $capture_color_bg_git_position
+      set_color $capture_color_fg_git_position
+      echo -n '  '$position
+    end
+  else
+    set -g capture_color_bg_next $capture_color_bg_git_branch
+    set_color $capture_color_fg_git_branch
+    echo -n '  '$branch
+  __capture_prompt_git_symbols
   end
 end
 
