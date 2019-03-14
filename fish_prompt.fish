@@ -591,7 +591,7 @@ function __capture_append_left_prompt_segment -d 'Append a segment to the left p
     set_color -r
     echo ''
     set_color normal
-    set -l $capture_first_segment 0
+    set -g $capture_first_segment 0
   end
   set_color -b $capture_color_bg_next
   echo $argv
@@ -877,7 +877,7 @@ set -x LOGIN $USER
 
 function fish_prompt -d 'Write out the left prompt of the capture theme'
   set -g last_status $status
-  set -l first_segment 1
+  set -g first_segment 1
   echo -n -s (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
              (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
              (__capture_append_left_prompt_segment (__capture_prompt_left_symbols)) \
