@@ -587,12 +587,12 @@ end
 ###############################
 function __capture_append_left_prompt_segment -d 'Append a segment to the left prompt'
   if set -q capture_color_bg_last
-    set_color capture_color_bg_next
+    set_color $capture_color_bg_next
     set_color -r
     echo ''
     set_color normal
   end
-  set_color -b capture_color_bg_next
+  set_color -b $capture_color_bg_next
   echo $argv
   set -U capture_color_bg_last $capture_color_bg_next
 end
@@ -601,9 +601,9 @@ end
 # => Append right prompt segment
 ################################
 function __capture_append_right_prompt_segment -d 'Append a segment to the right prompt'
-  set_color capture_color_bg_next
+  set_color $capture_color_bg_next
   echo ''
-  set_color -b capture_color_bg_next
+  set_color -b $capture_color_bg_next
   echo $argv
 end
 
