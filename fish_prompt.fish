@@ -594,8 +594,8 @@ end
 function __capture_append_left_prompt_segment -d 'Append a segment to the left prompt'
   if not set -q argv
     return
-#  else if [ $argv = '' ]
-#    return
+  else if [ $argv[1] = '' ]
+   return
   end
   if [ $capture_first_segment -eq 0 ]
     set_color $capture_color_bg_next
