@@ -832,6 +832,7 @@ end
 function __capture_prompt_symbols -d 'Display symbols'
   set -g capture_color_bg_next $capture_color_bg_theme_secondary
   set -l jobs (jobs | wc -l | tr -d '[:space:]')
+  set -l symbols ''
   if [ -e ~/.taskrc ]
     set todo (task due.before:sunday 2> /dev/null | tail -1 | cut -f1 -d' ')
     set overdue (task due.before:today 2> /dev/null | tail -1 | cut -f1 -d' ')
@@ -848,7 +849,6 @@ function __capture_prompt_symbols -d 'Display symbols'
   if [ (count $appointments) -eq 0 ]
     set appointments 0
   end
-
   if [ $capture_session_current != '' ]
     set symbols $symbols(set_color -o $capture_colors[8])' ✻'
   end
@@ -856,7 +856,7 @@ function __capture_prompt_symbols -d 'Display symbols'
     set symbols $symbols(set_color -o $capture_colors[10])' ⌘'
   end
   if set -q -x VIM
-    set symbols $symbols(set_color -o $capture_colors[9])' V'
+    set symbols $symbols(set_color -o $capture_colors[9])' '
   end
   if set -q -x RANGER_LEVEL
     set symbols $symbols(set_color -o $capture_colors[9])' R'
@@ -955,6 +955,8 @@ set -x LOGIN $USER
 ###############################################################################
 
 function fish_prompt -d 'Write out the left prompt of the capture theme'
+  set -e capture_color_bg_next
+  set -e capture_color_bg_last
   set -g last_status $status
   set -g capture_first_segment 1
   echo -n -s (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
