@@ -42,6 +42,7 @@ if [ $USER = 'root' ]
   set -U capture_color_bg_theme_primary bd4b43
 else
   set -U capture_color_bg_theme_primary 2990b5
+end
 set -U capture_color_fg_theme_primary $capture_color_fg_dark
 set -U capture_color_bg_theme_secondary 083743
 set -U capture_color_fg_theme_secondary $capture_color_fg_light
