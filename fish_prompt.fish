@@ -592,12 +592,7 @@ end
 # => Append left prompt segment
 ###############################
 function __capture_append_left_prompt_segment -d 'Append a segment to the left prompt'
-  if not set -q argv
-    return
-  else if [ $argv[1] = '' ]
-   return
-  end
-  if [ $capture_first_segment -eq 0 ]
+  if set -q capture_color_bg_last
     set_color $capture_color_bg_next
     set_color -r
     echo ''
@@ -960,7 +955,6 @@ set -x LOGIN $USER
 ###############################################################################
 
 function fish_prompt -d 'Write out the left prompt of the capture theme'
-  set -e capture_color_bg_next
   set -e capture_color_bg_last
   set -g last_status $status
   set -g capture_first_segment 1
