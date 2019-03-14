@@ -887,8 +887,7 @@ function __capture_prompt_symbols -d 'Display symbols'
     set symbols $symbols(set_color -o $capture_colors[6])' ⚡'
   end
   set symbols $symbols(set_color $capture_colors[2])' '(set_color normal)(set_color $capture_colors[2])
-  switch $pwd_style
-    echo -n $symbols
+  echo -n $symbols
 end
 
 ###############################################################################
