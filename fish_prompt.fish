@@ -877,7 +877,7 @@ set -x LOGIN $USER
 
 function fish_prompt -d 'Write out the left prompt of the capture theme'
   set -g last_status $status
-  set -g first_segment 1
+  set -g $capture_first_segment 1
   echo -n -s (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
              (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
              (__capture_append_left_prompt_segment (__capture_prompt_left_symbols)) \
