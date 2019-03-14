@@ -50,6 +50,10 @@ set -U capture_color_bg_git_main 445659
 set -U capture_color_fg_git_main $capture_color_fg_dark
 set -U capture_color_bg_git_tag 6c71c4
 set -U capture_color_fg_git_tag $capture_color_fg_dark
+set -U capture_color_bg_virtual_env 268bd2
+set -U capture_color_fg_virtual_env $capture_color_fg_dark
+
+set -U capture_color_bg_next $capture_color_bg_theme_primary
 
 set -U capture_night 000000 083743 445659 fdf6e3 2990b5 cb4b16 dc121f af005f 6c71c4 268bd2 2aa198 859900
 #                    0      1      2      3      4      5      6      7      8      9      10     11
@@ -578,15 +582,38 @@ function __capture_edit_commandline -d 'Open current commandline with your edito
   rm $capture_tmpfile
 end
 
+###############################
+# => Append left prompt segment
+###############################
+function __capture_append_left_prompt_segment -d 'Append a segment to the left prompt'
+  if set -q capture_color_bg_last
+    set_color capture_color_bg_next
+    set_color -r
+    echo ''
+    set_color normal
+  end
+  set_color -b capture_color_bg_next
+  echo $argv
+  set -U capture_color_bg_last $capture_color_bg_next
+
+################################
+# => Append right prompt segment
+################################
+function __capture_append_right_prompt_segment -d 'Append a segment to the right prompt'
+  set_color capture_color_bg_next
+  echo ''
+  set_color -b capture_color_bg_next
+  echo $argv
+
+
 ########################
 # => Virtual Env segment
 ########################
 function __capture_prompt_virtual_env -d 'Return the current virtual env name'
   if set -q VIRTUAL_ENV
-    set_color -b $capture_colors[9]
-    echo -n ''
+    set -U capture_color_bg_next $capture_color_bg_virtual_env
+    set_color $capture_color_fg_virtual_env
     echo -n ' '(basename "$VIRTUAL_ENV")' '
-    set_color -b $capture_colors[1] $capture_colors[9]
   end
 end
 
@@ -594,6 +621,8 @@ end
 # => PWD segment
 ################
 function __capture_prompt_pwd -d 'Displays the present working directory'
+  set -U capture_color_bg_next $capture_color_bg_theme_primary
+  set_color $capture_color_fg_theme_primary
   set -l user_host ' '
   if set -q SSH_CLIENT
     if [ $symbols_style = 'symbols' ]
@@ -607,7 +636,6 @@ function __capture_prompt_pwd -d 'Displays the present working directory'
       set user_host " $USER@"(hostname -i)':'
     end
   end
-  set_color -b $capture_current_bindmode_color $capture_colors[1]
   if [ (count $capture_prompt_error) != 1 ]
     switch $pwd_style
       case short
@@ -619,11 +647,6 @@ function __capture_prompt_pwd -d 'Displays the present working directory'
     echo -n " $capture_prompt_error "
     set -e capture_prompt_error[1]
   end
-  set_color normal
-  set_color $capture_current_bindmode_color
-  set_color -b $capture_colors[2]
-  echo -n ''
-  set_color normal
 end
 
 ######################
@@ -851,5 +874,10 @@ set -x LOGIN $USER
 
 function fish_prompt -d 'Write out the left prompt of the capture theme'
   set -g last_status $status
-  echo -n -s (__capture_prompt_bindmode) (__capture_prompt_virtual_env) (__capture_prompt_pwd) (__capture_prompt_left_symbols) ' ' (set_color normal)
+  echo -n -s (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
+             (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
+             (__capture_append_left_prompt_segment (__capture_prompt_left_symbols)) \
+             (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
+
+  #echo -n -s (__capture_prompt_bindmode) (__capture_prompt_virtual_env) (__capture_prompt_pwd) (__capture_prompt_left_symbols) ' ' (set_color normal)
 end
