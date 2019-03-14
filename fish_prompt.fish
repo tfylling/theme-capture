@@ -880,6 +880,5 @@ function fish_prompt -d 'Write out the left prompt of the capture theme'
              (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
              (__capture_append_left_prompt_segment (__capture_prompt_left_symbols)) \
              (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
-  set -e capture_color_bg_next
   #echo -n -s (__capture_prompt_bindmode) (__capture_prompt_virtual_env) (__capture_prompt_pwd) (__capture_prompt_left_symbols) ' ' (set_color normal)
 end
