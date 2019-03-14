@@ -32,74 +32,43 @@ if not test (uname) = Darwin
   end
 end
 
-###############################################################################
-# => Functions
-###############################################################################
-
-#####################
-# => Toggle functions
-#####################
-function __capture_toggle_symbols -d 'Toggles style of symbols, press # in NORMAL or VISUAL mode'
-  if [ $symbols_style = 'symbols' ]
-    set symbols_style 'numbers'
-  else
-    set symbols_style 'symbols'
-  end
-  set pwd_hist_lock true
-  commandline -f repaint
-end
-
-function __capture_toggle_pwd -d 'Toggles style of pwd segment, press space bar in NORMAL or VISUAL mode'
-  for i in (seq (count $capture_pwdstyle))
-    if [ $capture_pwdstyle[$i] = $pwd_style ]
-      set pwd_style $capture_pwdstyle[(expr $i \% (count $capture_pwdstyle) + 1)]
-      set pwd_hist_lock true
-      commandline -f repaint
-      break
-      end
-  end
-end
-
 #############################
 # => Command duration segment
 #############################
 function __capture_cmd_duration -d 'Displays the elapsed time of last command'
-  switch $pwd_style
-    case short long
-      set -l hundredths ''
-      set -l seconds ''
-      set -l minutes ''
-      set -l hours ''
-      set -l days ''
-      set_color $capture_colors[2]
-      echo -n ''
-      if [ $last_status -ne 0 ]
-        echo -n (set_color -b $capture_colors[2] $capture_colors[7])' '
-      else
-        echo -n (set_color -b $capture_colors[2] $capture_colors[12])' '
-      end
-      set hundredths (expr $CMD_DURATION / 10 \% 100)
-      if [ $hundredths -lt 10 ]
-        set hundredths '0'$hundredths
-      end
-      set -l cmd_duration (expr $CMD_DURATION / 1000)
-      set seconds (expr $cmd_duration \% 68400 \% 3600 \% 60)
-      if [ $cmd_duration -ge 60 ]
-        set minutes (expr $cmd_duration \% 68400 \% 3600 / 60)'m'
-        if [ $cmd_duration -ge 3600 ]
-          set hours (expr $cmd_duration \% 68400 / 3600)'h'
-          if [ $cmd_duration -ge 68400 ]
-            set days (expr $cmd_duration / 68400)'d'
-          end
-        end
-      end
-      if [ $cmd_duration -lt 10 ]
-        echo -n $seconds'.'$hundredths's '
-      else
-        echo -n $days$hours$minutes$seconds's '
-      end
-      set_color -b $capture_colors[2]
+  set_color $capture_colors[2]
+  echo -n ''
+  set -l hundredths ''
+  set -l seconds ''
+  set -l minutes ''
+  set -l hours ''
+  set -l days ''
+  if [ $last_status -ne 0 ]
+    echo -n (set_color -b $capture_colors[2] $capture_colors[7])'  '
+  else
+    echo -n (set_color -b $capture_colors[2] $capture_colors[12])'  '
   end
+  set hundredths (expr $CMD_DURATION / 10 \% 100)
+  if [ $hundredths -lt 10 ]
+    set hundredths '0'$hundredths
+  end
+  set -l cmd_duration (expr $CMD_DURATION / 1000)
+  set seconds (expr $cmd_duration \% 68400 \% 3600 \% 60)
+  if [ $cmd_duration -ge 60 ]
+    set minutes (expr $cmd_duration \% 68400 \% 3600 / 60)'m'
+    if [ $cmd_duration -ge 3600 ]
+      set hours (expr $cmd_duration \% 68400 / 3600)'h'
+      if [ $cmd_duration -ge 68400 ]
+        set days (expr $cmd_duration / 68400)'d'
+      end
+    end
+  end
+  if [ $cmd_duration -lt 10 ]
+    echo -n $seconds'.'$hundredths's '
+  else
+    echo -n $days$hours$minutes$seconds's '
+  end
+  set_color -b $capture_colors[2]
 end
 
 ################
@@ -133,95 +102,48 @@ function __capture_prompt_git_symbols -d 'Displays the git symbols'
   if [ -z $is_repo ]
     return
   end
-
   set -l git_ahead_behind (__capture_is_git_ahead_or_behind)
   set -l git_status (__capture_git_status)
   set -l git_stashed (__capture_is_git_stashed)
-
   if [ (expr $git_ahead_behind[1] + $git_ahead_behind[2] + $git_status[1] + $git_status[2] + $git_status[3] + $git_status[4] + $git_status[5] + $git_status[6] + $git_stashed) -ne 0 ]
-    set_color $capture_colors[3]
-    echo -n ''
-    set_color -b $capture_colors[3]
-    switch $pwd_style
-      case long short
-        if [ $symbols_style = 'symbols' ]
-          if [ $git_ahead_behind[1] -gt 0 ]
-            set_color -o $capture_colors[5]
-            echo -n ' ↑'
-          end
-          if [ $git_ahead_behind[2] -gt 0 ]
-            set_color -o $capture_colors[5]
-            echo -n ' ↓'
-          end
-          if [ $git_status[1] -gt 0 ]
-            set_color -o $capture_colors[12]
-            echo -n ' 落'
-          end
-          if [ $git_status[2] -gt 0 ]
-            set_color -o $capture_colors[7]
-            echo -n ' '
-          end
-          if [ $git_status[3] -gt 0 ]
-            set_color -o $capture_colors[10]
-            echo -n ' '
-          end
-          if [ $git_status[4] -gt 0 ]
-            set_color -o $capture_colors[8]
-            echo -n ' →'
-          end
-          if [ $git_status[5] -gt 0 ]
-            set_color -o $capture_colors[9]
-            echo -n ' ═'
-          end
-          if [ $git_status[6] -gt 0 ]
-            set_color -o $capture_colors[4]
-            echo -n ' ●'
-          end
-          if [ $git_stashed -gt 0 ]
-            set_color -o $capture_colors[11]
-            echo -n ' '
-          end
-        else
-          if [ $git_ahead_behind[1] -gt 0 ]
-            set_color $capture_colors[5]
-            echo -n ' '$git_ahead_behind[1]
-          end
-          if [ $git_ahead_behind[2] -gt 0 ]
-            set_color $capture_colors[5]
-            echo -n ' '$git_ahead_behind[2]
-          end
-          if [ $git_status[1] -gt 0 ]
-            set_color $capture_colors[12]
-            echo -n ' '$git_status[1]
-          end
-          if [ $git_status[2] -gt 0 ]
-            set_color $capture_colors[7]
-            echo -n ' '$git_status[2]
-          end
-          if [ $git_status[3] -gt 0 ]
-            set_color $capture_colors[10]
-            echo -n ' '$git_status[3]
-          end
-          if [ $git_status[4] -gt 0 ]
-            set_color $capture_colors[8]
-            echo -n ' '$git_status[4]
-          end
-          if [ $git_status[5] -gt 0 ]
-            set_color $capture_colors[9]
-            echo -n ' '$git_status[5]
-          end
-          if [ $git_status[6] -gt 0 ]
-            set_color $capture_colors[4]
-            echo -n ' '$git_status[6]
-          end
-          if [ $git_stashed -gt 0 ]
-            set_color $capture_colors[11]
-            echo -n ' '$git_stashed
-          end
-        end
-        set_color -b $capture_colors[3] normal
-        echo -n ' '
+    if [ $git_ahead_behind[1] -gt 0 ]
+      set_color -o $capture_colors[5]
+      echo -n ' ↑'
     end
+    if [ $git_ahead_behind[2] -gt 0 ]
+      set_color -o $capture_colors[5]
+      echo -n ' ↓'
+    end
+    if [ $git_status[1] -gt 0 ]
+      set_color -o $capture_colors[12]
+      echo -n ' 落'
+    end
+    if [ $git_status[2] -gt 0 ]
+      set_color -o $capture_colors[7]
+      echo -n ' '
+    end
+    if [ $git_status[3] -gt 0 ]
+      set_color -o $capture_colors[10]
+      echo -n ' '
+    end
+    if [ $git_status[4] -gt 0 ]
+      set_color -o $capture_colors[8]
+      echo -n ' →'
+    end
+    if [ $git_status[5] -gt 0 ]
+      set_color -o $capture_colors[9]
+      echo -n ' ═'
+    end
+    if [ $git_status[6] -gt 0 ]
+      set_color -o $capture_colors[4]
+      echo -n ' ●'
+    end
+    if [ $git_stashed -gt 0 ]
+      set_color -o $capture_colors[11]
+      echo -n ' '
+    end
+    set_color -b $capture_colors[3] normal
+    echo -n ' '
   end
 end
 
@@ -266,11 +188,18 @@ function __capture_prompt_git_branch -d 'Return the current branch name'
   end
 end
 
+function __capture_prompt_git -d 'Join branch and symbols'
+    set_color $capture_colors[3]
+    echo -n ''
+    set_color -b $capture_colors[3]
+
+end
+
 ###############################################################################
 # => Prompt
 ###############################################################################
 
 function fish_right_prompt -d 'Write out the right prompt of the capture theme'
-  echo -n -s (__capture_cmd_duration) (__capture_prompt_git_symbols) (__capture_prompt_git_branch)
+  echo -n -s (__capture_cmd_duration) (__capture_prompt_git_branch) (__capture_prompt_git_symbols)
   set_color normal
 end

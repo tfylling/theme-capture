@@ -36,7 +36,20 @@
 ###############################################################################
 
 # Define colors
-set -U capture_night 000000 083743 445659 fdf6e3 b58900 cb4b16 dc121f af005f 6c71c4 268bd2 2aa198 859900
+set -U capture_color_fg_dark 000000
+set -U capture_color_fg_light fdf6e3
+set -U capture_color_bg_theme_primary 2990b5
+set -U capture_color_fg_theme_primary $capture_color_fg_dark
+set -U capture_color_bg_theme_secondary 083743
+set -U capture_color_fg_theme_secondary $capture_color_fg_light
+set -U capture_color_fg_ok_text 859900
+set -U capture_color_fg_error_text dc121f
+set -U capture_color_bg_error_segment dc121f
+set -U capture_color_fg_error_segment $capture_color_fg_dark
+set -U capture_color_bg_git_
+
+set -U capture_night 000000 083743 445659 fdf6e3 2990b5 cb4b16 dc121f af005f 6c71c4 268bd2 2aa198 859900
+                     0      1      2      3      4      5      6      7      8      9      10     11
 set -U capture_day 000000 333333 666666 ffffff ffff00 ff6600 ff0000 ff0033 3300ff 00aaff 00ffff 00ff00
 if not set -q capture_colors
   # Values are: black dark_gray light_gray white yellow orange red magenta violet blue cyan green
@@ -101,19 +114,6 @@ function capture_help -d 'Show helpfile'
 end
 
 ################
-# => Environment
-################
-function day -d "Set color palette for bright environment."
-  set capture_colors $capture_day
-  set capture_cursors "\033]12;#$capture_colors[10]\007" "\033]12;#$capture_colors[5]\007" "\033]12;#$capture_colors[8]\007" "\033]12;#$capture_colors[9]\007"
-end
-
-function night -d "Set color palette for dark environment."
-  set capture_colors $capture_night
-  set capture_cursors "\033]12;#$capture_colors[10]\007" "\033]12;#$capture_colors[5]\007" "\033]12;#$capture_colors[8]\007" "\033]12;#$capture_colors[9]\007"
-end
-
-################
 # => Pre execute
 ################
 function __capture_preexec -d 'Execute after hitting <Enter> before doing anything else'
@@ -153,13 +153,6 @@ function __capture_preexec -d 'Execute after hitting <Enter> before doing anythi
           if [ (count $capture_prompt_error) -gt 1 ]
             set capture_prompt_error $capture_prompt_error[1]
           end
-          commandline -f repaint
-          return
-        end
-      case 'day' 'night'
-        if [ (count $cmd) -eq 1 ]
-          eval $cmd
-          commandline ''
           commandline -f repaint
           return
         end
@@ -665,7 +658,7 @@ end
 ####################
 function __capture_prompt_left_symbols -d 'Display symbols'
     set -l symbols_urgent 'F'
-    set -l symbols (set_color -b $capture_colors[2])''
+    #set -l symbols (set_color -b $capture_colors[2])''
 
     set -l jobs (jobs | wc -l | tr -d '[:space:]')
     if [ -e ~/.taskrc ]
