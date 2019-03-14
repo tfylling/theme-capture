@@ -592,7 +592,9 @@ end
 # => Append left prompt segment
 ###############################
 function __capture_append_left_prompt_segment -d 'Append a segment to the left prompt'
-  if not set -q argv or [ $argv = '' ]
+  if not set -q argv
+    return
+  else if [ $argv = '' ]
     return
   end
   if [ $capture_first_segment -eq 0 ]
