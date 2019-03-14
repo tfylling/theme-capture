@@ -39,7 +39,7 @@ end
 
 function fish_right_prompt -d 'Write out the right prompt of the capture theme'
   echo -n -s \
-              (__capture_append_right_prompt_segment (__capture_cmd_duration))
-#             (__capture_append_right_prompt_segment (__capture_prompt_git_branch))
+             (__capture_append_right_prompt_segment (__capture_cmd_duration)) \
+             (__capture_append_right_prompt_segment (__capture_prompt_git_branch))
   set_color normal
 end
