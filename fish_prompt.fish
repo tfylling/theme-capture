@@ -46,10 +46,13 @@ set -U capture_color_fg_ok_text 859900
 set -U capture_color_fg_error_text dc121f
 set -U capture_color_bg_error_segment dc121f
 set -U capture_color_fg_error_segment $capture_color_fg_dark
-set -U capture_color_bg_git_
+set -U capture_color_bg_git_main 445659
+set -U capture_color_fg_git_main $capture_color_fg_dark
+set -U capture_color_bg_git_tag 6c71c4
+set -U capture_color_fg_git_tag $capture_color_fg_dark
 
 set -U capture_night 000000 083743 445659 fdf6e3 2990b5 cb4b16 dc121f af005f 6c71c4 268bd2 2aa198 859900
-                     0      1      2      3      4      5      6      7      8      9      10     11
+#                    0      1      2      3      4      5      6      7      8      9      10     11
 set -U capture_day 000000 333333 666666 ffffff ffff00 ff6600 ff0000 ff0033 3300ff 00aaff 00ffff 00ff00
 if not set -q capture_colors
   # Values are: black dark_gray light_gray white yellow orange red magenta violet blue cyan green
