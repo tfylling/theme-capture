@@ -587,10 +587,10 @@ end
 ###############################
 function __capture_append_left_prompt_segment -d 'Append a segment to the left prompt'
   if [ $capture_first_segment -ne 1 ]
-    set_color $capture_color_bg_next
-    set_color -r
+    #set_color $capture_color_bg_next
+    #set_color -r
     echo ''
-    set_color normal
+    #set_color normal
   end
   set_color -b $capture_color_bg_next
   echo $argv
