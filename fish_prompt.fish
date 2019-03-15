@@ -852,7 +852,7 @@ function __capture_prompt_symbols -d 'Display symbols'
     set symbols $symbols(set_color -o $capture_colors[11])' ⚙'
   end
   if [ ! -w . ]
-    set symbols $symbols(set_color -o $capture_colors[6])' '
+    set symbols $symbols(set_color -o $capture_colors[6])' '
   end
   if [ $todo -gt 0 ]
     set symbols $symbols(set_color -o $capture_colors[4])
