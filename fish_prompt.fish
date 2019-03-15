@@ -623,8 +623,8 @@ function __capture_prompt_pwd -d 'Displays the present working directory'
   end
   if [ (count $capture_prompt_error) != 1 ]
     set -l home_path ~
-    set -l short_path (pwd | sed "s|^$home_path|~|")
-    set -l path_elements (echo $short_path | string split "/")
+    set short_path (pwd | sed "s|^$home_path|~|")
+    set path_elements (echo $short_path | string split "/")
     if [ (count $path_elements) -gt 2 ]
       set -l shortpath ('…/'$path_elements[-2]'/'$path_elements[-1])
     end
