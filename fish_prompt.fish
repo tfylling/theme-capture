@@ -594,7 +594,7 @@ end
 ################################
 function __capture_append_right_prompt_segment -d 'Append a segment to the right prompt'
   set_color $capture_color_bg_next
-  echo ''
+  #echo ''
   set_color -b $capture_color_bg_next
   echo $argv
 end
