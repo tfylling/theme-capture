@@ -765,18 +765,18 @@ function __capture_prompt_git_branch -d 'Return the current branch name'
       if test $commit
         set -g capture_color_bg_next $capture_color_bg_git_commit
         set_color $capture_color_fg_git_commit
-        echo -n ' ➦ '$commit
+        echo -n '  ➦ '$commit
       end
     else
       set -g capture_color_bg_next $capture_color_bg_git_position
       set_color $capture_color_fg_git_position
       set -l position (echo -n $position | sed -e 's|tags/| |')
-      echo -n ' '$position
+      echo -n '  '$position
     end
   else
     set -g capture_color_bg_next $capture_color_bg_git_branch
     set_color $capture_color_fg_git_branch
-    echo -n '  '$branch
+    echo -n '   '$branch
   end
   __capture_prompt_git_symbols
 end
