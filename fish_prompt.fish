@@ -42,7 +42,7 @@ if [ $USER = 'root' ]
 else
   set -U capture_color_bg_theme_primary 2990b5
 end
-set -U capture_color_fg_theme_primary $capture_color_fg_dark
+set -U capture_color_fg_theme_primary $capture_color_fg_light
 set -U capture_color_bg_theme_secondary 083743
 set -U capture_color_fg_theme_secondary $capture_color_fg_light
 set -U capture_color_fg_ok_text 859900
@@ -619,24 +619,27 @@ function __capture_prompt_pwd -d 'Displays the present working directory'
   set_color $capture_color_fg_theme_primary
   set -l user_host ' '
   if set -q SSH_CLIENT
-    if [ $symbols_style = 'symbols' ]
-      switch $pwd_style
-        case short
-          set user_host " $USER@"(hostname -s)':'
-        case long
-          set user_host " $USER@"(hostname -f)':'
-      end
-    else
-      set user_host " $USER@"(hostname -i)':'
-    end
+    set user_host " $USER@"(hostname -s)':'
   end
   if [ (count $capture_prompt_error) != 1 ]
-    switch $pwd_style
-      case short
-        echo -n $user_host(prompt_pwd)' '
-      case long
-        echo -n $user_host(pwd)' '
+    set -l home_path ~
+    set -l short_path (pwd | sed "s|^$home_path|~|")
+    set -l path_elements (echo $short_path | string split "/")
+    if [ (count $path_elements) -gt 2 ]
+      set -l shortpath ('…/'$path_elements[-2]'/'$path_elements[-1])
     end
+    if [ $short_path = '~' ]
+      set pwd_icon = ''
+    else
+      switch $path_elements[0]
+        case 'etc'
+          set pwd_icon = ''
+        case '*'
+          set pwd_icon = ''
+      end
+    end
+    echo -n ' '$pwd_icon' '$short_path' '
+  end
   else
     echo -n " $capture_prompt_error "
     set -e capture_prompt_error[1]
@@ -904,7 +907,7 @@ end
 
 # Set favorite editor
 if not set -q EDITOR
-  set -g EDITOR vi
+  set -g EDITOR vim
 end
 
 # Source config file
@@ -916,12 +919,6 @@ end
 if not set -q capture_nocmdhist
   set -U capture_nocmdhist 'c' 'd' 'll' 'ls' 'm' 's'
 end
-
-# Set PWD segment style
-if not set -q capture_pwdstyle
-  set -U capture_pwdstyle short long none
-end
-set pwd_style $capture_pwdstyle[1]
 
 # Cd to newest bookmark if this is a login shell
 if not begin
