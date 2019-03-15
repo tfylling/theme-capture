@@ -45,6 +45,8 @@ end
 set -U capture_color_fg_theme_primary $capture_color_fg_light
 set -U capture_color_bg_theme_secondary 083743
 set -U capture_color_fg_theme_secondary $capture_color_fg_light
+set -U capture_color_bg_os $capture_color_fg_light
+set -U capture_color_fg_os $capture_color_bg_theme_primary
 set -U capture_color_fg_ok_text 859900
 set -U capture_color_fg_error_text dc121f
 set -U capture_color_bg_error_segment dc121f
@@ -811,6 +813,14 @@ function __capture_prompt_bindmode -d 'Displays the current mode'
       echo -n " $pcount "
   end
   set_color -b normal $capture_current_bindmode_color
+end
+
+###############
+# => OS segment
+###############
+function __capture_prompt_os_icon -d 'Displays icon for current OS'
+  set -g capture_color_bg_next $capture_color_bg_os
+  echo -n (set_color $capture_color_fg_os)''
 end
 
 ####################
