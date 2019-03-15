@@ -820,7 +820,9 @@ end
 ###############
 function __capture_prompt_os_icon -d 'Displays icon for current OS'
   set -g capture_color_bg_next $capture_color_bg_os
-  echo -n (set_color $capture_color_fg_os)''
+  # TODO: fix lookup
+  set os_icon ''
+  echo -n (set_color $capture_color_fg_os)' '$os_icon' '
 end
 
 ####################
