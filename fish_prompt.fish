@@ -639,7 +639,6 @@ function __capture_prompt_pwd -d 'Displays the present working directory'
       end
     end
     echo -n ' '$pwd_icon' '$short_path' '
-  end
   else
     echo -n " $capture_prompt_error "
     set -e capture_prompt_error[1]
