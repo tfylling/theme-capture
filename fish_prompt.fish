@@ -629,13 +629,13 @@ function __capture_prompt_pwd -d 'Displays the present working directory'
       set -l shortpath ('…/'$path_elements[-2]'/'$path_elements[-1])
     end
     if [ $short_path = '~' ]
-      set pwd_icon = ''
+      set pwd_icon ''
     else
       switch $path_elements[1]
         case 'etc'
-          set pwd_icon = ''
+          set pwd_icon ''
         case '*'
-          set pwd_icon = ''
+          set pwd_icon ''
       end
     end
     echo -n ' '$pwd_icon' '$short_path' '
