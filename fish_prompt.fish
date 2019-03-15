@@ -631,8 +631,8 @@ function __capture_prompt_pwd -d 'Displays the present working directory'
     if [ $short_path = '~' ]
       set pwd_icon = ''
     else
-      set temp $path_elements[0]
-      switch $temp
+      echo $path_elements
+      switch $path_elements[0]
         case 'etc'
           set pwd_icon = ''
         case '*'
