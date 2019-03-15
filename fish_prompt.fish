@@ -594,7 +594,7 @@ end
 ################################
 function __capture_append_right_prompt_segment -d 'Append a segment to the right prompt'
   set_color $capture_color_bg_next
-  #echo ''
+  echo ''
   set_color -b $capture_color_bg_next
   echo $argv
 end
@@ -948,6 +948,6 @@ function fish_prompt -d 'Write out the left prompt of the capture theme'
              (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
              (__capture_append_left_prompt_segment (__capture_prompt_symbols)) \
              (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
-  echo -e -n "\b"
+  echo -e -n " \b"
   #echo -n -s (__capture_prompt_bindmode) (__capture_prompt_virtual_env) (__capture_prompt_pwd) (__capture_prompt_left_symbols) ' ' (set_color normal)
 end
