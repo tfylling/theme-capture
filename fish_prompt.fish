@@ -43,7 +43,7 @@ else
   set -U capture_color_bg_theme_primary 2990b5
 end
 set -U capture_color_fg_theme_primary $capture_color_fg_light
-set -U capture_color_bg_theme_secondary 083743
+set -U capture_color_bg_theme_secondary 103746
 set -U capture_color_fg_theme_secondary $capture_color_fg_light
 set -U capture_color_bg_os $capture_color_fg_light
 set -U capture_color_fg_os $capture_color_bg_theme_primary
@@ -628,7 +628,7 @@ function __capture_prompt_pwd -d 'Displays the present working directory'
     set short_path (pwd | sed "s|^$home_path|~|")
     set path_elements (echo $short_path | string split "/")
     if [ (count $path_elements) -gt 2 ]
-      set -l shortpath ('…/'$path_elements[-2]'/'$path_elements[-1])
+      set -l short_path '…/'$path_elements[-2]'/'$path_elements[-1]
     end
     if [ $short_path = '~' ]
       set pwd_icon ''
