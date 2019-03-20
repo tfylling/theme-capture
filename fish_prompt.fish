@@ -628,10 +628,7 @@ function __capture_prompt_pwd -d 'Displays the present working directory'
     set short_path (pwd | sed "s|^$home_path|~|")
     set path_elements (echo $short_path | string split "/")
     if [ (count $path_elements) -gt 2 ]
-      echo -n "BLAH"
       set short_path '…/'$path_elements[-2]'/'$path_elements[-1]
-    else
-      echo "BOO"
     end
     if [ $short_path = '~' ]
       set pwd_icon ''
