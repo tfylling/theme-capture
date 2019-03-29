@@ -707,7 +707,7 @@ function __capture_return_code -d 'Displays the return code of the last command'
     set_color $capture_color_fg_return_code_error
     echo -n ' '
     if [ $last_status -gt 128 ]
-      set last_status (expr $last_status - 128)
+      set -l last_status (expr $last_status - 128)
       echo -n $signals[$last_status]'('$last_status')'
     else
       echo -n $last_status
