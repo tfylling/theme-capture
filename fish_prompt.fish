@@ -968,9 +968,9 @@ set -x LOGIN $USER
 ###############################################################################
 
 function fish_prompt -d 'Write out the left prompt of the capture theme'
-  echo $status
-  set -e capture_color_bg_last
   set -g last_status $status
+  echo $last_status
+  set -e capture_color_bg_last
   set -g capture_first_segment 1
   echo -n -s \
              (__capture_append_left_prompt_segment (__capture_prompt_os_icon)) \
