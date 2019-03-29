@@ -708,7 +708,7 @@ function __capture_return_code -d 'Displays the return code of the last command'
     echo -n ' '
     if [ $last_status -gt 128 ]
       set -l last_status (expr $last_status - 128)
-      echo -n $signals[$last_status]'('$last_status')'
+      echo -n 'SIG'$signals[$last_status]'('$last_status')'
     else
       echo -n $last_status
     end
@@ -817,7 +817,7 @@ function __capture_prompt_git_branch -d 'Return the current branch name'
 end
 
 ######################
-# => Bind-mode segment
+# => Bind-mode segmentcd
 ######################
 function __capture_prompt_bindmode -d 'Displays the current mode'
   switch $fish_bind_mode
