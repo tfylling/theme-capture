@@ -59,6 +59,10 @@ set -U capture_color_bg_git_branch 445659
 set -U capture_color_fg_git_branch $capture_color_fg_light
 set -U capture_color_bg_virtual_env 268bd2
 set -U capture_color_fg_virtual_env $capture_color_fg_dark
+set -U capture_color_bg_duration $capture_color_fg_light
+set -U capture_color_fg_duration $capture_color_bg_theme_primary
+set -U capture_color_bg_return_code ff0000
+set -U capture_color_fg_return_code 00ffff
 
 #set -U capture_color_bg_next $capture_color_bg_theme_primary
 
@@ -651,7 +655,7 @@ end
 # => Command duration segment
 #############################
 function __capture_cmd_duration -d 'Displays the elapsed time of last command'
-  set -g capture_color_bg_next $capture_color_bg_theme_secondary
+  set -g capture_color_bg_next $capture_color_bg_duration
   set -l hundredths ''
   set -l seconds ''
   set -l minutes ''
@@ -672,16 +676,21 @@ function __capture_cmd_duration -d 'Displays the elapsed time of last command'
       end
     end
   end
-  if [ $last_status -ne 0 ]
-    set_color $capture_color_fg_error_text
-  else
-    set_color $capture_color_fg_ok_text
-  end
+  set_color $capture_color_fg_duration
   echo -n '  '
   if [ $cmd_duration -lt 10 ]
     echo -n $seconds'.'$hundredths's'
   else
     echo -n $days$hours$minutes$seconds's'
+  end
+end
+
+########################
+# => Return code segment
+########################
+function __capture_return_code -d 'Displays the return code of the last command'
+  if [ $last_status -nq 0 ]
+    echo -n $last_status
   end
 end
 
