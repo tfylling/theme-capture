@@ -951,14 +951,15 @@ function fish_prompt -d 'Write out the left prompt of the capture theme'
   set -e capture_color_bg_last
   set -g last_status $status
   set -g capture_first_segment 1
-  echo -n -s \
-             (__capture_append_left_prompt_segment (__capture_prompt_os_icon)) \
-             (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
-             (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
-             (__capture_append_left_prompt_segment (__capture_prompt_symbols)) \
-             (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
-  if [ $USER = 'root' ]
-    echo -e -n " \b"
-  end
+  echo -n -s '> '
+#  echo -n -s \
+#             (__capture_append_left_prompt_segment (__capture_prompt_os_icon)) \
+#             (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
+#             (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
+#             (__capture_append_left_prompt_segment (__capture_prompt_symbols)) \
+#             (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
+#  if [ $USER = 'root' ]
+#    echo -e -n " \b"
+#  end
   #echo -n -s (__capture_prompt_bindmode) (__capture_prompt_virtual_env) (__capture_prompt_pwd) (__capture_prompt_left_symbols) ' ' (set_color normal)
 end
