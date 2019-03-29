@@ -590,7 +590,8 @@ function __capture_append_left_prompt_segment -d 'Append a segment to the left p
   if set -q capture_color_bg_last
     set_color $capture_color_bg_next
     set_color -r
-    echo ''
+    #echo ''
+    echo ''
     set_color normal
   end
   set_color -b $capture_color_bg_next
@@ -607,7 +608,8 @@ function __capture_append_right_prompt_segment -d 'Append a segment to the right
     return
   end
   set_color $capture_color_bg_next
-  echo ''
+  #echo ''
+  echo ''
   set_color -b $capture_color_bg_next
   echo $argv
 end
