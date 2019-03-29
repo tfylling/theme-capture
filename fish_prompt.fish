@@ -62,7 +62,7 @@ set -U capture_color_fg_virtual_env $capture_color_fg_dark
 set -U capture_color_bg_duration $capture_color_bg_theme_primary
 set -U capture_color_fg_duration $capture_color_fg_light
 set -U capture_color_bg_return_code_ok $capture_color_fg_light
-set -U capture_color_fg_return_code_ok capture_color_fg_ok_text
+set -U capture_color_fg_return_code_ok $capture_color_fg_ok_text
 set -U capture_color_bg_return_code_error ff0000
 set -U capture_color_fg_return_code_error 00ffff
 
@@ -694,14 +694,14 @@ end
 # => Return code segment
 ########################
 function __capture_return_code -d 'Displays the return code of the last command'
-  if [ $last_status -eq 0 ]
+  if [ $status -eq 0 ]
     set -g capture_color_bg_next $capture_color_bg_return_code_ok
     set_color $capture_color_fg_return_code_ok
     echo -n ' ✔'
   else
     set -g capture_color_bg_next $capture_color_bg_return_code_error
     set_color $capture_color_fg_return_code_error
-    echo -n ' '$last_status
+    echo -n ' '$status
   end
 end
 
