@@ -64,7 +64,7 @@ set -U capture_color_fg_duration $capture_color_fg_light
 set -U capture_color_bg_return_code_ok $capture_color_fg_light
 set -U capture_color_fg_return_code_ok $capture_color_fg_ok_text
 set -U capture_color_bg_return_code_error ff0000
-set -U capture_color_fg_return_code_error 00ffff
+set -U capture_color_fg_return_code_error ffff00
 
 #set -U capture_color_bg_next $capture_color_bg_theme_primary
 
@@ -906,8 +906,10 @@ function __capture_prompt_symbols -d 'Display symbols'
 #  else
 #    set symbols $symbols(set_color -o $capture_colors[7])' ✘'
 #  end
-  set symbols $symbols(set_color $capture_colors[2])' '(set_color normal)(set_color $capture_colors[2])
-  echo -n $symbols
+  if [ symbols != '' ]
+    set symbols $symbols(set_color $capture_colors[2])' '(set_color normal)(set_color $capture_colors[2])
+    echo -n $symbols
+  end
 end
 
 ###############################################################################
@@ -969,7 +971,6 @@ set -x LOGIN $USER
 
 function fish_prompt -d 'Write out the left prompt of the capture theme'
   set -g last_status $status
-  echo $last_status
   set -e capture_color_bg_last
   set -g capture_first_segment 1
   echo -n -s \
@@ -977,7 +978,6 @@ function fish_prompt -d 'Write out the left prompt of the capture theme'
              (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
              (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
              (__capture_append_left_prompt_segment (__capture_prompt_symbols)) \
-             (__capture_append_left_prompt_segment (__capture_return_code)) \
              (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
   if [ $USER = 'root' ]
     echo -e -n " \b"
