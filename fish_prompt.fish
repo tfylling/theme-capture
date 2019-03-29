@@ -694,14 +694,14 @@ end
 # => Return code segment
 ########################
 function __capture_return_code -d 'Displays the return code of the last command'
-  if [ $status -eq 0 ]
+  if [ $last_status -eq 0 ]
     set -g capture_color_bg_next $capture_color_bg_return_code_ok
     set_color $capture_color_fg_return_code_ok
-    echo -n ' ✔'
+    echo -n '  '
   else
     set -g capture_color_bg_next $capture_color_bg_return_code_error
     set_color $capture_color_fg_return_code_error
-    echo -n ' '$status
+    echo -n ' '$last_status'  '
   end
 end
 
@@ -968,6 +968,7 @@ set -x LOGIN $USER
 ###############################################################################
 
 function fish_prompt -d 'Write out the left prompt of the capture theme'
+  echo $status
   set -e capture_color_bg_last
   set -g last_status $status
   set -g capture_first_segment 1
@@ -976,6 +977,7 @@ function fish_prompt -d 'Write out the left prompt of the capture theme'
              (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
              (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
              (__capture_append_left_prompt_segment (__capture_prompt_symbols)) \
+             (__capture_append_left_prompt_segment (__capture_return_code)) \
              (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
   if [ $USER = 'root' ]
     echo -e -n " \b"
