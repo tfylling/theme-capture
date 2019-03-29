@@ -80,6 +80,8 @@ end
 # Define values for: normal_mode insert_mode visual_mode
 set -U capture_cursors "\033]12;#$capture_colors[10]\007" "\033]12;#$capture_colors[5]\007" "\033]12;#$capture_colors[8]\007" "\033]12;#$capture_colors[9]\007"
 
+set -U signals "HUP" "INT" "QUIT" "ILL" "TRAP" "ABRT" "BUS" "FPE" "KILL" "USR1" "EGV" "USR2" "PIPE" "ALRM" "TERM" "STKFLT" "CHLD" "CONT" "STOP" "TSTP" "TTIN" "TTOU" "URG" "XCPU" "XFSZ" "VTALRM" "PROF" WINCH" "IO" "PWR" "UNUSED"
+
 ###############################################################################
 # => Files
 ###############################################################################
@@ -645,8 +647,10 @@ function __capture_prompt_pwd -d 'Displays the present working directory'
       switch $path_elements[2]
         case 'etc'
           set pwd_icon ''
-        case '*'
+        case '~'
           set pwd_icon ''
+        case '*'
+          set pwd_icon ''
       end
     end
     echo -n ' '$pwd_icon' '$short_path' '
@@ -701,7 +705,14 @@ function __capture_return_code -d 'Displays the return code of the last command'
   else
     set -g capture_color_bg_next $capture_color_bg_return_code_error
     set_color $capture_color_fg_return_code_error
-    echo -n ' '$last_status'  '
+    echo -n ' '
+    if [ $last_status -le 128 ]
+      echo -n $last_status
+    else
+      set -l last_status (expr $last_status - 128)
+      echo -n $signals[$last_status]'('$last_status')'
+    end
+    echo -n '  '
   end
 end
 
@@ -906,7 +917,7 @@ function __capture_prompt_symbols -d 'Display symbols'
 #  else
 #    set symbols $symbols(set_color -o $capture_colors[7])' ✘'
 #  end
-  if [ symbols != '' ]
+  if [ $symbols != '' ]
     set symbols $symbols(set_color $capture_colors[2])' '(set_color normal)(set_color $capture_colors[2])
     echo -n $symbols
   end
