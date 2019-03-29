@@ -878,13 +878,13 @@ function __capture_prompt_symbols -d 'Display symbols'
   if [ $appointments -gt 0 ]
     set symbols $symbols(set_color -o $capture_colors[5])' ⚑'
   end
+  if [ $USER = 'root' ]
+    set symbols $symbols(set_color -o $capture_colors[6])' ⚡'
+  end
   if [ $last_status -eq 0 ]
     set symbols $symbols(set_color -o $capture_colors[12])' ✔'
   else
     set symbols $symbols(set_color -o $capture_colors[7])' ✘'
-  end
-  if [ $USER = 'root' ]
-    set symbols $symbols(set_color -o $capture_colors[6])' ⚡'
   end
   set symbols $symbols(set_color $capture_colors[2])' '(set_color normal)(set_color $capture_colors[2])
   echo -n $symbols
