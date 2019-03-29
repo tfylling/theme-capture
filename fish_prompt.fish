@@ -599,6 +599,9 @@ end
 # => Append right prompt segment
 ################################
 function __capture_append_right_prompt_segment -d 'Append a segment to the right prompt'
+  if not [ $argv ]
+    return
+  end
   set_color $capture_color_bg_next
   echo ''
   set_color -b $capture_color_bg_next
@@ -689,7 +692,9 @@ end
 # => Return code segment
 ########################
 function __capture_return_code -d 'Displays the return code of the last command'
+  set -g capture_color_bg_next $capture_color_bg_return_code
   if [ $last_status -nq 0 ]
+    set_color $capture_color_fg_return_code
     echo -n $last_status
   end
 end
