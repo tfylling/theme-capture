@@ -57,8 +57,8 @@ set -U capture_color_bg_git_position 6c71c4
 set -U capture_color_fg_git_position $capture_color_fg_dark
 set -U capture_color_bg_git_branch 445659
 set -U capture_color_fg_git_branch $capture_color_fg_light
-set -U capture_color_bg_virtual_env 268bd2
-set -U capture_color_fg_virtual_env $capture_color_fg_dark
+set -U capture_color_bg_virtual_env $capture_color_bg_theme_primary
+set -U capture_color_fg_virtual_env $capture_color_fg_light
 set -U capture_color_bg_duration $capture_color_bg_theme_primary
 set -U capture_color_fg_duration $capture_color_fg_light
 set -U capture_color_bg_return_code_ok $capture_color_fg_light
@@ -622,8 +622,6 @@ end
 ########################
 function __capture_prompt_virtual_env -d 'Return the current virtual env name'
   if set -q VIRTUAL_ENV
-    set -g capture_color_bg_next $capture_color_bg_theme_primary
-    set_color $capture_color_fg_theme_primary
     set -g capture_color_bg_next $capture_color_bg_virtual_env
     set_color $capture_color_fg_virtual_env
     echo -n ' ('(basename "$VIRTUAL_ENV")') '
