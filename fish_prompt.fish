@@ -588,9 +588,13 @@ function __capture_append_left_prompt_segment -d 'Append a segment to the left p
     return
   end
   if set -q capture_color_bg_last
-    set_color $capture_color_bg_next
-    set_color -r
-    echo ''
+    if [ $capture_color_bg_next = $capture_color_bg_last ]
+      echo ''
+    else
+      set_color $capture_color_bg_next
+      set_color -r
+      echo ''
+    end
     set_color normal
   end
   set_color -b $capture_color_bg_next
@@ -618,9 +622,11 @@ end
 ########################
 function __capture_prompt_virtual_env -d 'Return the current virtual env name'
   if set -q VIRTUAL_ENV
+    set -g capture_color_bg_next $capture_color_bg_theme_primary
+    set_color $capture_color_fg_theme_primary
     set -g capture_color_bg_next $capture_color_bg_virtual_env
     set_color $capture_color_fg_virtual_env
-    echo -n ' '(basename "$VIRTUAL_ENV")' '
+    echo -n ' ('(basename "$VIRTUAL_ENV")') '
   end
 end
 
@@ -985,8 +991,8 @@ function fish_prompt -d 'Write out the left prompt of the capture theme'
   set -g capture_first_segment 1
   echo -n -s \
              (__capture_append_left_prompt_segment (__capture_prompt_os_icon)) \
-             (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
              (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
+             (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
              (__capture_append_left_prompt_segment (__capture_prompt_symbols)) \
              (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
   if [ $USER = 'root' ]
