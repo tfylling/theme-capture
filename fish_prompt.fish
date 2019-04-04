@@ -57,8 +57,8 @@ set -U capture_color_bg_git_position 6c71c4
 set -U capture_color_fg_git_position $capture_color_fg_dark
 set -U capture_color_bg_git_branch 445659
 set -U capture_color_fg_git_branch $capture_color_fg_light
-set -U capture_color_bg_virtual_env $capture_color_bg_theme_primary
-set -U capture_color_fg_virtual_env $capture_color_fg_light
+set -U capture_color_bg_virtual_env $capture_color_fg_light
+set -U capture_color_fg_virtual_env $capture_color_bg_theme_primary
 set -U capture_color_bg_duration $capture_color_bg_theme_primary
 set -U capture_color_fg_duration $capture_color_fg_light
 set -U capture_color_bg_return_code_ok $capture_color_fg_light
