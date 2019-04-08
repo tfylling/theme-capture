@@ -285,7 +285,7 @@ function __capture_create_cmd_hist -e fish_prompt -d 'Create command history wit
       set $cmd_hist $$cmd_hist $cmd
     end
   end
-  #set fish_bind_mode insert
+  set fish_bind_mode insert
   #echo -n \a
   __capture_urgency
 end
