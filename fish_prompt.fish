@@ -59,6 +59,8 @@ set -U capture_color_bg_git_branch 445659
 set -U capture_color_fg_git_branch $capture_color_fg_light
 set -U capture_color_bg_virtual_env $capture_color_fg_light
 set -U capture_color_fg_virtual_env $capture_color_bg_theme_primary
+set -U capture_color_bg_key_bindings $capture_color_fg_light
+set -U capture_color_fg_key_bindings $capture_color_bg_theme_primary
 set -U capture_color_bg_duration $capture_color_bg_theme_primary
 set -U capture_color_fg_duration $capture_color_fg_light
 set -U capture_color_bg_return_code_ok $capture_color_fg_light
@@ -617,6 +619,30 @@ function __capture_append_right_prompt_segment -d 'Append a segment to the right
   echo $argv
 end
 
+#########################
+# => Key Bindings segment
+#########################
+function __capture_prompt_key_bindings -d 'Print key bindings mode'
+  [ "$theme_display_vi" != 'no' ] or return
+  set -g capture_color_bg_next $capture_color_bg_virtual_env
+  set_color $capture_color_fg_virtual_env
+  [ "$fish_key_bindings" = 'fish_vi_key_bindings' \
+      -o "$fish_key_bindings" = 'hybrid_bindings' \
+      -o "$fish_key_bindings" = 'fish_hybrid_key_bindings' \
+      -o "$theme_display_vi" = 'yes' ]
+  or return
+  switch $fish_bind_mode
+    case default
+      echo -n 'N '
+    case insert
+      echo -n 'I '
+    case replace_one replace-one
+      echo -n 'R '
+    case visual
+      echo -n 'V '
+  end
+end
+
 
 ########################
 # => Virtual Env segment
@@ -949,9 +975,9 @@ set -g no_prompt_hist 'F'
 set -g symbols_style 'symbols'
 
 # Load user defined key bindings
-if functions --query fish_user_key_bindings
-  fish_user_key_bindings
-end
+# if functions --query fish_user_key_bindings
+#  fish_user_key_bindings
+# end
 
 # Set favorite editor
 if not set -q EDITOR
@@ -990,6 +1016,7 @@ function fish_prompt -d 'Write out the left prompt of the capture theme'
   set -g capture_first_segment 1
   echo -n -s \
              (__capture_append_left_prompt_segment (__capture_prompt_os_icon)) \
+             (__capture_append_left_prompt_segment (__capture_prompt_key_bindings)) \
              (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
              (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
              (__capture_append_left_prompt_segment (__capture_prompt_symbols)) \
