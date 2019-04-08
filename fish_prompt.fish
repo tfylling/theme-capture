@@ -285,7 +285,7 @@ function __capture_create_cmd_hist -e fish_prompt -d 'Create command history wit
       set $cmd_hist $$cmd_hist $cmd
     end
   end
-  set fish_bind_mode insert
+  #set fish_bind_mode insert
   #echo -n \a
   __capture_urgency
 end
@@ -847,36 +847,6 @@ function __capture_prompt_git_branch -d 'Return the current branch name'
   __capture_prompt_git_symbols
 end
 
-######################
-# => Bind-mode segmentcd
-######################
-function __capture_prompt_bindmode -d 'Displays the current mode'
-  switch $fish_bind_mode
-    case default
-      set capture_current_bindmode_color $capture_colors[10]
-      echo -en $capture_cursors[1]
-    case insert
-      set capture_current_bindmode_color $capture_colors[5]
-      echo -en $capture_cursors[2]
-      if [ "$pwd_hist_lock" = true ]
-        set pwd_hist_lock false
-        __capture_create_dir_hist
-      end
-    case visual
-      set capture_current_bindmode_color $capture_colors[8]
-      echo -en $capture_cursors[3]
-  end
-  if [ (count $capture_prompt_error) -eq 1 ]
-    set capture_current_bindmode_color $capture_colors[7]
-  end
-  set_color -b $capture_current_bindmode_color $capture_colors[1]
-  switch $pwd_style
-    case short long
-      echo -n " $pcount "
-  end
-  set_color -b normal $capture_current_bindmode_color
-end
-
 ###############
 # => OS segment
 ###############
@@ -976,9 +946,9 @@ set -g no_prompt_hist 'F'
 set -g symbols_style 'symbols'
 
 # Load user defined key bindings
-# if functions --query fish_user_key_bindings
-#  fish_user_key_bindings
-# end
+if functions --query fish_user_key_bindings
+  fish_user_key_bindings
+end
 
 # Set favorite editor
 if not set -q EDITOR
@@ -1025,5 +995,4 @@ function fish_prompt -d 'Write out the left prompt of the capture theme'
   if [ $USER = 'root' ]
     echo -e -n " \b"
   end
-  #echo -n -s (__capture_prompt_bindmode) (__capture_prompt_virtual_env) (__capture_prompt_pwd) (__capture_prompt_left_symbols) ' ' (set_color normal)
 end
