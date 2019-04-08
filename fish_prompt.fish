@@ -634,13 +634,13 @@ function __capture_prompt_key_bindings -d 'Print key bindings mode'
   or return
   switch $fish_bind_mode
     case default
-      echo -n 'N '
+      echo -n ' N '
     case insert
-      echo -n 'I '
+      echo -n ' I '
     case replace_one replace-one
-      echo -n 'R '
+      echo -n ' R '
     case visual
-      echo -n 'V '
+      echo -n ' V '
   end
 end
 
