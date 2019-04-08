@@ -623,7 +623,8 @@ end
 # => Key Bindings segment
 #########################
 function __capture_prompt_key_bindings -d 'Print key bindings mode'
-  [ "$theme_display_vi" != 'no' ] or return
+  [ "$theme_display_vi" != 'no' ]
+  or return
   set -g capture_color_bg_next $capture_color_bg_virtual_env
   set_color $capture_color_fg_virtual_env
   [ "$fish_key_bindings" = 'fish_vi_key_bindings' \
