@@ -1,4 +1,4 @@
-#set fish_key_bindings fish_vi_key_bindings
+set fish_key_bindings fish_vi_key_bindings
 bind '#' __capture_toggle_symbols
 bind -M visual '#' __capture_toggle_symbols
 bind ' ' __capture_toggle_pwd
