@@ -108,13 +108,15 @@ end
 function __capture_preexec -d 'Execute after hitting <Enter> before doing anything else'
   set -l cmd (commandline | sed 's|\s\+|\x1e|g')
   if [ $_ = 'fish' ]
-    echo $cmd' - '$_
     if [ -z $cmd[1] ]
+      echo "--1--"
       set -e cmd[1]
     end
     if [ -z $cmd[1] ]
+      echo "--2--"
       return
     end
+    echo "--3--"
     set -e capture_prompt_error[1]
     if not type -q $cmd[1]
       if [ -d $cmd[1] ]
@@ -148,6 +150,7 @@ function __capture_preexec -d 'Execute after hitting <Enter> before doing anythi
         end
     end
   end
+  echo "--4--"
   commandline -f execute
 end
 
