@@ -80,18 +80,6 @@ set -g capture_tmpfile '/tmp/'(echo %self)'_capture_edit.fish'
 # => Functions
 ###############################################################################
 
-##############
-# => Ring bell
-##############
-if set -q capture_nobell
-  function __capture_urgency -d 'Do nothing.'
-  end
-else
-  function __capture_urgency -d 'Ring the bell in order to set the urgency hint flag.'
-    echo -n \a
-  end
-end
-
 #################
 # => Window title
 #################
@@ -210,173 +198,6 @@ function m -d 'List bookmarks, jump to directory in list with m <number>'
     end
     tput ed
     tput cuu1
-  end
-end
-
-#############
-# => Sessions
-#############
-function __capture_delete_zombi_sessions -d 'Delete zombi sessions'
-  for i in $capture_sessions_active_pid
-    if not contains $i %fish
-      set -l item (contains -i $i $capture_sessions_active_pid)
-      set -e capture_sessions_active_pid[$item]
-      set -e capture_sessions_active[$item]
-    end
-  end
-end
-
-function __capture_create_new_session -d 'Create a new session'
-  set -U capture_session_cmd_hist_$argv[1] $$cmd_hist
-  set -U capture_session_dir_hist_$argv[1] $$dir_hist
-  set -U capture_sessions $argv[1] $capture_sessions
-end
-
-function __capture_erase_session -d 'Erase current session'
-  if [ (count $argv) -eq 1 ]
-    set_color $fish_color_error[1]
-    echo 'Missing argument: name of session to erase'
-    return
-  end
-  if contains $argv[2] $capture_sessions_active
-    set_color $fish_color_error[1]
-    echo "Session '$argv[2]' cannot be erased because it's currently active."
-    return
-  end
-  if contains $argv[2] $capture_sessions
-    set -e capture_session_cmd_hist_$argv[2]
-    set -e capture_session_dir_hist_$argv[2]
-    set -e capture_sessions[(contains -i $argv[2] $capture_sessions)]
-  else
-    set_color $fish_color_error[1]
-    echo "Session '$argv[2]' not found. "(set_color normal)'Enter '(set_color $fish_color_command[1])'s '(set_color normal)'to show a list of all recorded sessions.'
-  end
-end
-
-function __capture_detach_session -d 'Detach current session'
-  set cmd_hist cmd_hist_nosession
-  set dir_hist dir_hist_nosession
-  if [ -z $$dir_hist ] 2> /dev/null
-    set $dir_hist $PWD
-  end
-  set dir_hist_val (count $$dir_hist)
-  set -e capture_sessions_active_pid[$argv] 2> /dev/null
-  set -e capture_sessions_active[$argv] 2> /dev/null
-  set capture_session_current ''
-  cd $$dir_hist[1][$dir_hist_val]
-  set no_prompt_hist 'T'
-end
-
-function __capture_attach_session -d 'Attach session'
-  set argv (echo -sn $argv\n | sed 's|[^[:alnum:]]|_|g')
-  if contains $argv[1] $capture_sessions_active
-    wmctrl -a "✻ $argv[1]"
-  else
-    wt "✻ $argv[1]"
-    __capture_detach_session $argv[-1]
-    set capture_sessions_active $capture_sessions_active $argv[1]
-    set capture_sessions_active_pid $capture_sessions_active_pid %self
-    set capture_session_current $argv[1]
-    if not contains $argv[1] $capture_sessions
-      __capture_create_new_session $argv[1]
-    end
-    set cmd_hist capture_session_cmd_hist_$argv[1]
-    set dir_hist capture_session_dir_hist_$argv[1]
-    if [ -z $$dir_hist ] 2> /dev/null
-      set $dir_hist $PWD
-    end
-    set dir_hist_val (count $$dir_hist)
-    cd $$dir_hist[1][$dir_hist_val] 2> /dev/null
-  end
-  set no_prompt_hist 'T'
-end
-
-function s -d 'Create, delete or attach session'
-  __capture_delete_zombi_sessions
-  if [ (count $argv) -eq 0 ]
-    set -l active_indicator
-    set -l num_items (count $capture_sessions)
-    if [ $num_items -eq 0 ]
-      set_color $fish_color_error[1]
-      echo -n 'Session list is empty. '
-      set_color normal
-      echo -n 'Enter '
-      set_color $fish_color_command[1]
-      echo -n 's '
-      set_color $fish_color_param[1]
-      echo -n 'session-name'
-      set_color normal
-      echo ' to record the current session.'
-      return
-    end
-    for i in (seq $num_items)
-      if [ $capture_sessions[$i] = $capture_session_current ]
-        set_color $capture_colors[8]
-      else
-        if [ (expr \( $num_items - $i \) \% 2) -eq 0 ]
-          set_color normal
-        else
-          set_color $capture_colors[4]
-        end
-      end
-      if contains $capture_sessions[$i] $capture_sessions_active
-        set active_indicator '✻ '
-      else
-        set active_indicator ' '
-      end
-      echo '▶ '(expr $num_items - $i)\t$active_indicator$capture_sessions[$i]
-    end
-    if [ $num_items -eq 1 ]
-      set last_item ''
-    else
-      set last_item '-'(expr $num_items - 1)
-    end
-    echo -en $capture_cursors[3]
-    set input_length (expr length (expr $num_items - 1))
-    read -p 'echo -n (set_color -b $capture_colors[2] $capture_colors[8])" ✻ Attach [e|0"$last_item"] "(set_color -b normal $capture_colors[2])" "(set_color $capture_colors[8])' -n $input_length -l session_num
-    set pcount (expr $pcount - 1)
-    switch $session_num
-      case (seq 0 (expr $num_items - 1))
-        set argv[1] $capture_sessions[(expr $num_items - $session_num)]
-        for i in (seq (expr $num_items + 1))
-          tput cuu1
-        end
-        tput ed
-        tput cuu1
-      case 'e'
-        read -p 'echo -n (set_color -b $capture_colors[2] $capture_colors[8])" ✻ Erase [0"$last_item"] "(set_color -b normal $capture_colors[2])" "(set_color $capture_colors[8])' -n $input_length -l session_num
-        if [ (expr $num_items - $session_num) -gt 0 ]
-          __capture_erase_session -e $capture_sessions[(expr $num_items - $session_num)]
-        end
-        for i in (seq (expr $num_items + 3))
-          tput cuu1
-        end
-        tput ed
-        return
-      case '*'
-        for i in (seq (expr $num_items + 1))
-          tput cuu1
-        end
-        tput ed
-        tput cuu1
-        return
-    end
-  end
-  set -l item (contains -i %self $capture_sessions_active_pid 2> /dev/null)
-  switch $argv[1]
-    case '-e'
-      __capture_erase_session $argv
-    case '-d'
-      wt 'fish'
-      __capture_detach_session $item
-      tput cuu1
-      tput ed
-      set pcount (expr $pcount - 1)
-    case '-*'
-      set_color $fish_color_error[1]
-      echo "Invalid argument: $argv[1]"
-    case '*'
-      __capture_attach_session $argv $item
   end
 end
 
@@ -739,7 +560,7 @@ end
 ###############################################################################
 # => Prompt initialization
 ###############################################################################
-
+echo "foo"
 # Initialize some global variables
 set -g capture_prompt_error
 set -g capture_current_bindmode_color
@@ -777,6 +598,7 @@ end
 ###############################################################################
 
 function fish_prompt -d 'Write out the left prompt of the capture theme'
+  echo "prompt"
   set -g last_status $status
   set -e capture_color_bg_last
   set -g capture_first_segment 1
