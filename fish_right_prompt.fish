@@ -9,15 +9,6 @@
 # Author:
 #   Torbjørn Fylling <torbfylling@gmail.com>
 #
-# Sections:
-#   -> TTY Detection
-#   -> Functions
-#     -> Toggle functions
-#     -> Command duration segment
-#     -> Git segment
-#     -> PWD segment
-#   -> Prompt
-#
 ###############################################################################
 
 ###############################################################################

@@ -9,25 +9,6 @@
 # Author:
 #   Torbjørn Fylling <torbfylling@gmail.com>
 #
-# Sections:
-#   -> Color definitions
-#   -> Files
-#   -> Functions
-#     -> Ring bell
-#     -> Window title
-#     -> Environment
-#     -> Pre execute
-#     -> Directory history
-#     -> Command history
-#     -> Bookmarks
-#     -> Sessions
-#     -> Commandline editing with $EDITOR
-#     -> Git segment
-#     -> Bind-mode segment
-#     -> Symbols segment
-#   -> Prompt initialization
-#   -> Left prompt
-#
 ###############################################################################
 
 ###############################################################################
@@ -127,6 +108,7 @@ end
 function __capture_preexec -d 'Execute after hitting <Enter> before doing anything else'
   set -l cmd (commandline | sed 's|\s\+|\x1e|g')
   if [ $_ = 'fish' ]
+    echo "Fish detected"
     if [ -z $cmd[1] ]
       set -e cmd[1]
     end
@@ -177,164 +159,6 @@ function __capture_on_termination -s HUP -s INT -s QUIT -s TERM --on-process %se
   __capture_detach_session $item
 end
 
-######################
-# => Directory history
-######################
-function __capture_create_dir_hist -v PWD -d 'Create directory history without duplicates'
-  if [ "$pwd_hist_lock" = false ]
-    if contains $PWD $$dir_hist
-      set -e $dir_hist[1][(contains -i $PWD $$dir_hist)]
-    end
-    set $dir_hist $$dir_hist $PWD
-    set -g dir_hist_val (count $$dir_hist)
-  end
-end
-
-function __capture_cd_prev -d 'Change to previous directory, press H in NORMAL mode.'
-  if [ $dir_hist_val -gt 1 ]
-    set dir_hist_val (expr $dir_hist_val - 1)
-    set pwd_hist_lock true
-    cd $$dir_hist[1][$dir_hist_val]
-    commandline -f repaint
-  end
-end
-
-function __capture_cd_next -d 'Change to next directory, press L in NORMAL mode.'
-  if [ $dir_hist_val -lt (count $$dir_hist) ]
-    set dir_hist_val (expr $dir_hist_val + 1)
-    set pwd_hist_lock true
-    cd $$dir_hist[1][$dir_hist_val]
-    commandline -f repaint
-  end
-end
-
-function d -d 'List directory history, jump to directory in list with d <number>'
-  set -l num_items (expr (count $$dir_hist) - 1)
-  if [ $num_items -eq 0 ]
-    set_color $fish_color_error[1]
-    echo 'Directory history is empty. '(set_color normal)'It will be created automatically.'
-    return
-  end
-  if begin
-      [ (count $argv) -eq 1 ]
-      and [ $argv[1] -ge 0 ]
-      and [ $argv[1] -lt $num_items ]
-    end
-    cd $$dir_hist[1][(expr $num_items - $argv[1])]
-  else
-    for i in (seq $num_items)
-      if [ (expr \( $num_items - $i \) \% 2) -eq 0 ]
-        set_color normal
-      else
-        set_color $capture_colors[4]
-      end
-      echo '▶' (expr $num_items - $i)\t$$dir_hist[1][$i] | sed "s|$HOME|~|"
-    end
-    if [ $num_items -eq 1 ]
-      set last_item ''
-    else
-      set last_item '-'(expr $num_items - 1)
-    end
-    echo -en $capture_cursors[2]
-    set input_length (expr length (expr $num_items - 1))
-    read -p 'echo -n (set_color -b $capture_colors[2] $capture_colors[5])" ♻ Goto [e|0"$last_item"] "(set_color -b normal $capture_colors[2])" "(set_color $capture_colors[5])' -n $input_length -l dir_num
-    switch $dir_num
-      case (seq 0 (expr $num_items - 1))
-        cd $$dir_hist[1][(expr $num_items - $dir_num)]
-      case 'e'
-        read -p 'echo -n (set_color -b $capture_colors[2] $capture_colors[5])" ♻ Erase [0"$last_item"] "(set_color -b normal $capture_colors[2])" "(set_color $capture_colors[5])' -n $input_length -l dir_num
-        set -e $dir_hist[1][(expr $num_items - $dir_num)] 2> /dev/null
-        set dir_hist_val (count $$dir_hist)
-        tput cuu1
-    end
-    for i in (seq (expr $num_items + 1))
-      tput cuu1
-    end
-    tput ed
-    tput cuu1
-  end
-  set pcount (expr $pcount - 1)
-  set no_prompt_hist 'T'
-end
-
-####################
-# => Command history
-####################
-function __capture_create_cmd_hist -e fish_prompt -d 'Create command history without duplicates'
-  if [ $_ = 'fish' ]
-    set -l IFS ''
-    set -l cmd (echo $history[1] | fish_indent | expand -t 4)
-    # Create prompt history
-    if begin
-        [ $pcount -gt 0 ]
-        and [ $no_prompt_hist = 'F' ]
-      end
-      set prompt_hist[$pcount] $cmd
-    else
-      set no_prompt_hist 'F'
-    end
-    set pcount (expr $pcount + 1)
-    # Create command history
-    if not begin
-        expr $cmd : '[cdms] ' > /dev/null
-        or contains $cmd $capture_nocmdhist
-      end
-      if contains $cmd $$cmd_hist
-        set -e $cmd_hist[1][(contains -i $cmd $$cmd_hist)]
-      end
-      set $cmd_hist $$cmd_hist $cmd
-    end
-  end
-  set fish_bind_mode insert
-  #echo -n \a
-  __capture_urgency
-end
-
-function c -d 'List command history, load command from prompt with c <prompt number>'
-  set -l num_items (count $$cmd_hist)
-  if [ $num_items -eq 0 ]
-    set_color $fish_color_error[1]
-    echo 'Command history is empty. '(set_color normal)'It will be created automatically.'
-    return
-  end
-  for i in (seq $num_items)
-    if [ (expr \( $num_items - $i \) \% 2) -eq 0 ]
-      set_color normal
-    else
-      set_color $capture_colors[4]
-    end
-    echo -n '▶ '(expr $num_items - $i)
-    set -l item (echo $$cmd_hist[1][$i])
-    echo -n \t$item\n
-  end
-  if [ $num_items -eq 1 ]
-    set last_item ''
-  else
-    set last_item '-'(expr $num_items - 1)
-  end
-  echo -en $capture_cursors[4]
-  set input_length (expr length (expr $num_items - 1))
-  read -p 'echo -n (set_color -b $capture_colors[2] $capture_colors[9])" ↩ Exec [e|0"$last_item"] "(set_color -b normal $capture_colors[2])" "(set_color $capture_colors[9])' -n $input_length -l cmd_num
-  switch $cmd_num
-    case (seq 0 (expr $num_items - 1))
-      commandline $$cmd_hist[1][(expr $num_items - $cmd_num)]
-      echo $$cmd_hist[1][(expr $num_items - $cmd_num)] | xsel
-      for i in (seq (count (echo $$cmd_hist\n)))
-        tput cuu1
-      end
-    case 'e'
-      read -p 'echo -n (set_color -b $capture_colors[2] $capture_colors[9])" ↩ Erase [0"$last_item"] "(set_color -b normal $capture_colors[2])" "(set_color $capture_colors[9])' -n $input_length -l cmd_num
-      for i in (seq (count (echo $$cmd_hist\n)))
-        tput cuu1
-      end
-      tput cuu1
-      set -e $cmd_hist[1][(expr $num_items - $cmd_num)] 2> /dev/null
-  end
-  tput ed
-  tput cuu1
-  set pcount (expr $pcount - 1)
-  set no_prompt_hist 'T'
-end
 
 ##############
 # => Bookmarks
@@ -959,23 +783,6 @@ end
 if [ -e $capture_config ]
   source $capture_config
 end
-
-# Don't save in command history
-if not set -q capture_nocmdhist
-  set -U capture_nocmdhist 'c' 'd' 'll' 'ls' 'm' 's'
-end
-
-# Cd to newest bookmark if this is a login shell
-if not begin
-    set -q -x LOGIN
-    or set -q -x RANGER_LEVEL
-    or set -q -x VIM
-  end 2> /dev/null
-  if set -q bookmarks[1]
-    cd $bookmarks[1]
-  end
-end
-set -x LOGIN $USER
 
 ###############################################################################
 # => Left prompt
