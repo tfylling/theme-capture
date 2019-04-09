@@ -127,15 +127,6 @@ function __capture_preexec -d 'Execute after hitting <Enter> before doing anythi
   commandline -f execute
 end
 
-#####################
-# => Fish termination
-#####################
-function __capture_on_termination -s HUP -s INT -s QUIT -s TERM --on-process %self -d 'Execute when shell terminates'
-  set -l item (contains -i %self $capture_sessions_active_pid 2> /dev/null)
-  __capture_detach_session $item
-end
-
-
 ##############
 # => Bookmarks
 ##############
@@ -560,7 +551,6 @@ end
 ###############################################################################
 # => Prompt initialization
 ###############################################################################
-echo "foo"
 # Initialize some global variables
 set -g capture_prompt_error
 set -g capture_current_bindmode_color
@@ -598,7 +588,6 @@ end
 ###############################################################################
 
 function fish_prompt -d 'Write out the left prompt of the capture theme'
-  echo "prompt"
   set -g last_status $status
   set -e capture_color_bg_last
   set -g capture_first_segment 1
