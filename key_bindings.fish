@@ -8,5 +8,5 @@ bind H __capture_cd_prev
 bind m mark
 bind M unmark
 bind . __capture_edit_commandline
-bind -M insert \r __capture_preexec
-bind \r __capture_preexec
+#bind -M insert \r __capture_preexec
+#bind \r __capture_preexec
