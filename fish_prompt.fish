@@ -106,6 +106,8 @@ end
 # => Pre execute
 ################
 function __capture_preexec -d 'Execute after hitting <Enter> before doing anything else'
+  commandline -f execute
+  return
   set -l cmd (commandline | sed 's|\s\+|\x1e|g')
   if [ $_ = 'fish' ]
     if [ -z $cmd[1] ]
