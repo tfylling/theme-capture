@@ -85,6 +85,8 @@ function __capture_set_color_palette -d 'Set the color palette according to mode
       __capture_set_color_palette_replace
     case visual
       __capture_set_color_palette_visual
+  __capture_reset_colors
+end
 
 function __capture_set_color_palette_normal -d 'Set color palette for normal mode'
   set -U capture_color_bg_theme_primary $capture_color_palette_limeade
@@ -96,6 +98,7 @@ function __capture_set_color_palette_normal -d 'Set color palette for normal mod
   set -U capture_color_ok = $capture_color_palette_limeade
   set -U capture_color_error = $capture_color_palette_red
   set -U capture_color_error_contrast = $capture_color_palette_yellow
+end
 
 function __capture_set_color_palette_insert -d 'Set color palette for insert mode'
   if [ $USER = 'root' ]
@@ -112,6 +115,7 @@ function __capture_set_color_palette_insert -d 'Set color palette for insert mod
   set -U capture_color_ok = $capture_color_palette_limeade
   set -U capture_color_error = $capture_color_palette_red
   set -U capture_color_error_contrast = $capture_color_palette_yellow
+end
 
 function __capture_set_color_palette_replace -d 'Set color palette for replace mode'
   set -U capture_color_bg_theme_primary $capture_color_palette_red
@@ -123,6 +127,7 @@ function __capture_set_color_palette_replace -d 'Set color palette for replace m
   set -U capture_color_ok = $capture_color_palette_limeade
   set -U capture_color_error = $capture_color_palette_red
   set -U capture_color_error_contrast = $capture_color_palette_yellow
+end
 
 function __capture_set_color_palette_visual -d 'Set color palette for visual mode'
   set -U capture_color_bg_theme_primary $capture_color_palette_pirate_gold
@@ -134,8 +139,7 @@ function __capture_set_color_palette_visual -d 'Set color palette for visual mod
   set -U capture_color_ok = $capture_color_palette_limeade
   set -U capture_color_error = $capture_color_palette_red
   set -U capture_color_error_contrast = $capture_color_palette_yellow
-
-
+end
 
 function __capture_reset_colors -d 'Reset colors when primary definitions change'
     set -U capture_color_bg_os $capture_color_bg_theme_contrast
@@ -151,7 +155,7 @@ function __capture_reset_colors -d 'Reset colors when primary definitions change
     set -U capture_color_fg_return_code_ok $capture_color_fg_ok
     set -U capture_color_bg_return_code_error $capture_color_error
     set -U capture_color_fg_return_code_error $capture_color_error_contrast
-
+end
 
 #################
 # => Window title
