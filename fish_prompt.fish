@@ -19,6 +19,7 @@
 set -U capture_color_palette_silver cdcdcd
 set -U capture_color_palette_boulder 777777
 set -U capture_color_palette_mine_shaft 212121
+set -U capture_color_palette_bright_red af0000
 set -U capture_color_palette_red ff0000
 set -U capture_color_palette_sangria 8f0006
 set -U capture_color_palette_venetian_red 6e0019
@@ -119,12 +120,12 @@ function __capture_set_color_palette_insert -d 'Set color palette for insert mod
 end
 
 function __capture_set_color_palette_replace -d 'Set color palette for replace mode'
-  set -U capture_color_bg_theme_primary $capture_color_palette_red
+  set -U capture_color_bg_theme_primary $capture_color_palette_bright_red
   set -U capture_color_fg_theme_primary $capture_color_palette_silver
   set -U capture_color_bg_theme_secondary $capture_color_palette_mine_shaft
   set -U capture_color_fg_theme_secondary $capture_color_palette_boulder
   set -U capture_color_bg_theme_contrast $capture_color_palette_silver
-  set -U capture_color_fg_theme_contrast $capture_color_palette_red
+  set -U capture_color_fg_theme_contrast $capture_color_palette_bright_red
   set -U capture_color_ok $capture_color_palette_limeade
   set -U capture_color_error $capture_color_palette_red
   set -U capture_color_error_contrast $capture_color_palette_yellow
