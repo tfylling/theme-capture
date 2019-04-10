@@ -153,7 +153,7 @@ function __capture_reset_colors -d 'Reset colors when primary definitions change
     set -U capture_color_bg_duration $capture_color_bg_theme_primary
     set -U capture_color_fg_duration $capture_color_fg_theme_primary
     set -U capture_color_bg_return_code_ok $capture_color_bg_theme_contrast
-    set -U capture_color_fg_return_code_ok $capture_color_fg_ok
+    set -U capture_color_fg_return_code_ok $capture_color_ok
     set -U capture_color_bg_return_code_error $capture_color_error
     set -U capture_color_fg_return_code_error $capture_color_error_contrast
 end
