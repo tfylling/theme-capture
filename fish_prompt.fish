@@ -96,8 +96,8 @@ function __capture_set_color_palette_normal -d 'Set color palette for normal mod
   set -U capture_color_fg_theme_secondary $capture_color_palette_boulder
   set -U capture_color_bg_theme_contrast $capture_color_palette_silver
   set -U capture_color_fg_theme_contrast $capture_color_palette_crusoe
-  set -U capture_color_ok = $capture_color_palette_limeade
-  set -U capture_color_error = $capture_color_palette_red
+  set -U capture_color_ok $capture_color_palette_limeade
+  set -U capture_color_error $capture_color_palette_red
   set -U capture_color_error_contrast $capture_color_palette_yellow
 end
 
@@ -113,8 +113,8 @@ function __capture_set_color_palette_insert -d 'Set color palette for insert mod
   set -U capture_color_fg_theme_secondary $capture_color_palette_silver
   set -U capture_color_bg_theme_contrast $capture_color_palette_silver
   set -U capture_color_fg_theme_contrast $capture_color_bg_theme_primary
-  set -U capture_color_ok = $capture_color_palette_limeade
-  set -U capture_color_error = $capture_color_palette_red
+  set -U capture_color_ok $capture_color_palette_limeade
+  set -U capture_color_error $capture_color_palette_red
   set -U capture_color_error_contrast $capture_color_palette_yellow
 end
 
@@ -125,8 +125,8 @@ function __capture_set_color_palette_replace -d 'Set color palette for replace m
   set -U capture_color_fg_theme_secondary $capture_color_palette_boulder
   set -U capture_color_bg_theme_contrast $capture_color_palette_silver
   set -U capture_color_fg_theme_contrast $capture_color_palette_red
-  set -U capture_color_ok = $capture_color_palette_limeade
-  set -U capture_color_error = $capture_color_palette_red
+  set -U capture_color_ok $capture_color_palette_limeade
+  set -U capture_color_error $capture_color_palette_red
   set -U capture_color_error_contrast $capture_color_palette_yellow
 end
 
@@ -137,8 +137,8 @@ function __capture_set_color_palette_visual -d 'Set color palette for visual mod
   set -U capture_color_fg_theme_secondary $capture_color_palette_pirate_gold
   set -U capture_color_bg_theme_contrast $capture_color_palette_silver
   set -U capture_color_fg_theme_contrast $capture_color_palette_nutmeg_wood_finish
-  set -U capture_color_ok = $capture_color_palette_limeade
-  set -U capture_color_error = $capture_color_palette_red
+  set -U capture_color_ok $capture_color_palette_limeade
+  set -U capture_color_error $capture_color_palette_red
   set -U capture_color_error_contrast $capture_color_palette_yellow
 end
 
