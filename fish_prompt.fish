@@ -16,24 +16,24 @@
 ###############################################################################
 
 # Define colors
-set -l capture_color_palette_silver cdcdcd
-set -l capture_color_palette_boulder 777777
-set -l capture_color_palette_mine_shaft 212121
-set -l capture_color_palette_red ff0000
-set -l capture_color_palette_sangria 8f0006
-set -l capture_color_palette_venetian_red 6e0019
-set -l capture_color_palette_pirate_gold ce8c00
-set -l capture_color_palette_nutmeg_wood_finish 6d4a00
-set -l capture_color_palette_yellow ffff00
-set -l capture_color_palette_limeade 859900
-set -l capture_color_palette_fun_green 006d4a
-set -l capture_color_palette_crusoe 004d00
-set -l capture_color_palette_jungle_green 2aa198
-set -l capture_color_palette_river_bed 445659
-set -l capture_color_palette_bahama_blue 006d8f
-set -l capture_color_palette_regal_blue 004b6e
-set -l capture_color_palette_blue_marguerite 6c71c4
-set -l capture_color_palette_black 000000
+set -U capture_color_palette_silver cdcdcd
+set -U capture_color_palette_boulder 777777
+set -U capture_color_palette_mine_shaft 212121
+set -U capture_color_palette_red ff0000
+set -U capture_color_palette_sangria 8f0006
+set -U capture_color_palette_venetian_red 6e0019
+set -U capture_color_palette_pirate_gold ce8c00
+set -U capture_color_palette_nutmeg_wood_finish 6d4a00
+set -U capture_color_palette_yellow ffff00
+set -U capture_color_palette_limeade 859900
+set -U capture_color_palette_fun_green 006d4a
+set -U capture_color_palette_crusoe 004d00
+set -U capture_color_palette_jungle_green 2aa198
+set -U capture_color_palette_river_bed 445659
+set -U capture_color_palette_bahama_blue 006d8f
+set -U capture_color_palette_regal_blue 004b6e
+set -U capture_color_palette_blue_marguerite 6c71c4
+set -U capture_color_palette_black 000000
 
 set -U capture_color_bg_git_commit $capture_color_palette_jungle_green
 set -U capture_color_fg_git_commit $capture_color_palette_black
