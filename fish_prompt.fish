@@ -85,6 +85,7 @@ function __capture_set_color_palette -d 'Set the color palette according to mode
       __capture_set_color_palette_replace
     case visual
       __capture_set_color_palette_visual
+  end
   __capture_reset_colors
 end
 
