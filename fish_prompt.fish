@@ -16,40 +16,31 @@
 ###############################################################################
 
 # Define colors
-set -U capture_color_fg_dark 000000
-set -U capture_color_fg_light fdf6e3
-if [ $USER = 'root' ]
-  set -U capture_color_bg_theme_primary bd4b43
-else
-  set -U capture_color_bg_theme_primary 2990b5
-end
-set -U capture_color_fg_theme_primary $capture_color_fg_light
-set -U capture_color_bg_theme_secondary 14475a
-set -U capture_color_fg_theme_secondary $capture_color_fg_light
-set -U capture_color_bg_os $capture_color_fg_light
-set -U capture_color_fg_os $capture_color_bg_theme_primary
-set -U capture_color_fg_ok_text 859900
-set -U capture_color_fg_error_text dc121f
-set -U capture_color_bg_error_segment dc121f
-set -U capture_color_fg_error_segment $capture_color_fg_dark
-set -U capture_color_bg_git_commit 2aa198
-set -U capture_color_fg_git_commit $capture_color_fg_dark
-set -U capture_color_bg_git_position 6c71c4
-set -U capture_color_fg_git_position $capture_color_fg_dark
-set -U capture_color_bg_git_branch 445659
-set -U capture_color_fg_git_branch $capture_color_fg_light
-set -U capture_color_bg_virtual_env $capture_color_fg_light
-set -U capture_color_fg_virtual_env $capture_color_bg_theme_primary
-set -U capture_color_bg_key_bindings $capture_color_fg_light
-set -U capture_color_fg_key_bindings $capture_color_bg_theme_primary
-set -U capture_color_bg_duration $capture_color_bg_theme_primary
-set -U capture_color_fg_duration $capture_color_fg_light
-set -U capture_color_bg_return_code_ok $capture_color_fg_light
-set -U capture_color_fg_return_code_ok $capture_color_fg_ok_text
-set -U capture_color_bg_return_code_error ff0000
-set -U capture_color_fg_return_code_error ffff00
+set -l capture_color_palette_silver cdcdcd
+set -l capture_color_palette_boulder 777777
+set -l capture_color_palette_mine_shaft 212121
+set -l capture_color_palette_red ff0000
+set -l capture_color_palette_sangria 8f0006
+set -l capture_color_palette_venetian_red 6e0019
+set -l capture_color_palette_pirate_gold ce8c00
+set -l capture_color_palette_nutmeg_wood_finish 6d4a00
+set -l capture_color_palette_yellow ffff00
+set -l capture_color_palette_limeade 859900
+set -l capture_color_palette_fun_green 006d4a
+set -l capture_color_palette_crusoe 004d00
+set -l capture_color_palette_jungle_green 2aa198
+set -l capture_color_palette_river_bed 445659
+set -l capture_color_palette_bahama_blue 006d8f
+set -l capture_color_palette_regal_blue 004b6e
+set -l capture_color_palette_blue_marguerite 6c71c4
+set -l capture_color_palette_black 000000
 
-#set -U capture_color_bg_next $capture_color_bg_theme_primary
+set -U capture_color_bg_git_commit $capture_color_palette_jungle_green
+set -U capture_color_fg_git_commit $capture_color_palette_black
+set -U capture_color_bg_git_position $capture_color_palette_blue_marguerite
+set -U capture_color_fg_git_position $capture_color_palette_black
+set -U capture_color_bg_git_branch $capture_color_palette_river_bed
+set -U capture_color_fg_git_branch $capture_color_palette_black
 
 set -U capture_night 000000 083743 445659 fdf6e3 2990b5 cb4b16 dc121f af005f 6c71c4 268bd2 2aa198 859900
 #                    0      1      2      3      4      5      6      7      8      9      10     11
@@ -79,6 +70,88 @@ set -g capture_tmpfile '/tmp/'(echo %self)'_capture_edit.fish'
 ###############################################################################
 # => Functions
 ###############################################################################
+
+
+####################
+# => Color functions
+####################
+function __capture_set_color_palette -d 'Set the color palette according to mode'
+  switch $fish_bind_mode
+    case default
+      __capture_set_color_palette_normal
+    case insert
+      __capture_set_color_palette_insert
+    case replace_one replace-one
+      __capture_set_color_palette_replace
+    case visual
+      __capture_set_color_palette_visual
+
+function __capture_set_color_palette_normal -d 'Set color palette for normal mode'
+  set -U capture_color_bg_theme_primary $capture_color_palette_limeade
+  set -U capture_color_fg_theme_primary = $capture_color_palette_crusoe
+  set -U capture_color_bg_theme_secondary $capture_color_palette_mine_shaft
+  set -U capture_color_fg_theme_secondary = $capture_color_palette_boulder
+  set -U capture_color_bg_theme_contrast $capture_color_palette_silver
+  set -U capture_color_fg_theme_contrast = $capture_color_palette_crusoe
+  set -U capture_color_ok = $capture_color_palette_limeade
+  set -U capture_color_error = $capture_color_palette_red
+  set -U capture_color_error_contrast = $capture_color_palette_yellow
+
+function __capture_set_color_palette_insert -d 'Set color palette for insert mode'
+  if [ $USER = 'root' ]
+    set -U capture_color_bg_theme_primary $capture_color_palette_sangria
+    set -U capture_color_bg_theme_secondary $capture_color_palette_venetian_red
+  else
+    set -U capture_color_bg_theme_primary $capture_color_palette_bahama_blue
+    set -U capture_color_bg_theme_secondary $capture_color_palette_regal_blue
+  end
+  set -U capture_color_fg_theme_primary = $capture_color_palette_silver
+  set -U capture_color_fg_theme_secondary = $capture_color_palette_silver
+  set -U capture_color_bg_theme_contrast $capture_color_palette_silver
+  set -U capture_color_fg_theme_contrast = $capture_color_bg_theme_primary
+  set -U capture_color_ok = $capture_color_palette_limeade
+  set -U capture_color_error = $capture_color_palette_red
+  set -U capture_color_error_contrast = $capture_color_palette_yellow
+
+function __capture_set_color_palette_replace -d 'Set color palette for replace mode'
+  set -U capture_color_bg_theme_primary $capture_color_palette_red
+  set -U capture_color_fg_theme_primary = $capture_color_palette_silver
+  set -U capture_color_bg_theme_secondary $capture_color_palette_mine_shaft
+  set -U capture_color_fg_theme_secondary = $capture_color_palette_boulder
+  set -U capture_color_bg_theme_contrast $capture_color_palette_silver
+  set -U capture_color_fg_theme_contrast = $capture_color_palette_red
+  set -U capture_color_ok = $capture_color_palette_limeade
+  set -U capture_color_error = $capture_color_palette_red
+  set -U capture_color_error_contrast = $capture_color_palette_yellow
+
+function __capture_set_color_palette_visual -d 'Set color palette for visual mode'
+  set -U capture_color_bg_theme_primary $capture_color_palette_pirate_gold
+  set -U capture_color_fg_theme_primary = $capture_color_palette_nutmeg_wood_finish
+  set -U capture_color_bg_theme_secondary $capture_color_palette_nutmeg_wood_finish
+  set -U capture_color_fg_theme_secondary = $capture_color_palette_pirate_gold
+  set -U capture_color_bg_theme_contrast $capture_color_palette_silver
+  set -U capture_color_fg_theme_contrast = $capture_color_palette_nutmeg_wood_finish
+  set -U capture_color_ok = $capture_color_palette_limeade
+  set -U capture_color_error = $capture_color_palette_red
+  set -U capture_color_error_contrast = $capture_color_palette_yellow
+
+
+
+function __capture_reset_colors -d 'Reset colors when primary definitions change'
+    set -U capture_color_bg_os $capture_color_bg_theme_contrast
+    set -U capture_color_fg_os $capture_color_fg_theme_contrast
+    set -U capture_color_fg_ok_text $capture_color_ok
+    set -U capture_color_bg_ok_text $capture_color_bg_theme_contrast
+    set -U capture_color_fg_error_text $capture_color_error
+    set -U capture_color_bg_virtual_env $capture_color_fg_theme_primary
+    set -U capture_color_fg_virtual_env $capture_color_bg_theme_primary
+    set -U capture_color_bg_duration $capture_color_bg_theme_primary
+    set -U capture_color_fg_duration $capture_color_fg_theme_primary
+    set -U capture_color_bg_return_code_ok $capture_color_bg_contrast
+    set -U capture_color_fg_return_code_ok $capture_color_fg_ok
+    set -U capture_color_bg_return_code_error $capture_color_error
+    set -U capture_color_fg_return_code_error $capture_color_error_contrast
+
 
 #################
 # => Window title
@@ -242,32 +315,6 @@ function __capture_append_right_prompt_segment -d 'Append a segment to the right
   set_color -b $capture_color_bg_next
   echo $argv
 end
-
-#########################
-# => Key Bindings segment
-#########################
-function __capture_prompt_key_bindings -d 'Print key bindings mode'
-  [ "$theme_display_vi" != 'no' ]
-  or return
-  set -g capture_color_bg_next $capture_color_bg_virtual_env
-  set_color $capture_color_fg_virtual_env
-  [ "$fish_key_bindings" = 'fish_vi_key_bindings' \
-      -o "$fish_key_bindings" = 'hybrid_bindings' \
-      -o "$fish_key_bindings" = 'fish_hybrid_key_bindings' \
-      -o "$theme_display_vi" = 'yes' ]
-  or return
-  switch $fish_bind_mode
-    case default
-      echo -n ' N '
-    case insert
-      echo -n ' I '
-    case replace_one replace-one
-      echo -n ' R '
-    case visual
-      echo -n ' V '
-  end
-end
-
 
 ########################
 # => Virtual Env segment
@@ -591,9 +638,9 @@ function fish_prompt -d 'Write out the left prompt of the capture theme'
   set -g last_status $status
   set -e capture_color_bg_last
   set -g capture_first_segment 1
+  __capture_set_color_palette
   echo -n -s \
              (__capture_append_left_prompt_segment (__capture_prompt_os_icon)) \
-             (__capture_append_left_prompt_segment (__capture_prompt_key_bindings)) \
              (__capture_append_left_prompt_segment (__capture_prompt_virtual_env)) \
              (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
              (__capture_append_left_prompt_segment (__capture_prompt_symbols)) \
