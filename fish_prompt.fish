@@ -93,8 +93,8 @@ end
 function __capture_set_color_palette_normal -d 'Set color palette for normal mode'
   set -U capture_color_bg_theme_primary $capture_color_palette_limeade
   set -U capture_color_fg_theme_primary $capture_color_palette_crusoe
-  set -U capture_color_bg_theme_secondary $capture_color_palette_mine_shaft
-  set -U capture_color_fg_theme_secondary $capture_color_palette_boulder
+  set -U capture_color_bg_theme_secondary $capture_color_palette_crusoe
+  set -U capture_color_fg_theme_secondary $capture_color_palette_limeade
   set -U capture_color_bg_theme_contrast $capture_color_palette_silver
   set -U capture_color_fg_theme_contrast $capture_color_palette_crusoe
   set -U capture_color_ok $capture_color_palette_limeade
