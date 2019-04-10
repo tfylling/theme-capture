@@ -40,7 +40,7 @@ set -U capture_color_fg_git_commit $capture_color_palette_black
 set -U capture_color_bg_git_position $capture_color_palette_blue_marguerite
 set -U capture_color_fg_git_position $capture_color_palette_black
 set -U capture_color_bg_git_branch $capture_color_palette_river_bed
-set -U capture_color_fg_git_branch $capture_color_palette_black
+set -U capture_color_fg_git_branch $capture_color_palette_silver
 
 set -U capture_night 000000 083743 445659 fdf6e3 2990b5 cb4b16 dc121f af005f 6c71c4 268bd2 2aa198 859900
 #                    0      1      2      3      4      5      6      7      8      9      10     11
