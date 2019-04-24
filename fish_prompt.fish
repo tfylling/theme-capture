@@ -651,7 +651,7 @@ function fish_prompt -d 'Write out the left prompt of the capture theme'
              (__capture_append_left_prompt_segment (__capture_prompt_pwd)) \
              (__capture_append_left_prompt_segment (__capture_prompt_symbols)) \
              (set_color normal)(set_color $capture_color_bg_last)' '(set_color normal)
-  if [ $USER = 'root' ]
-    echo -e -n " \b"
-  end
+# if [ $USER = 'root' ]
+#   echo -e -n " \b"
+# end
 end
