@@ -530,9 +530,9 @@ end
 function __capture_prompt_os_icon -d 'Displays icon for current OS'
   set -g capture_color_bg_next $capture_color_bg_os
   set -l os (cat /etc/os-release|sed -n -e "s/^ID=//p")
-  if [ os = "ubuntu" ]
+  if [ $os = "ubuntu" ]
     set os_icon ''
-  else if [ os = "debian" ]
+  else if [ $os = "debian" ]
     set os_icon ''
   else
     set os_icon ''
