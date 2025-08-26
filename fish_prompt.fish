@@ -469,11 +469,11 @@ function __capture_prompt_git_symbols -d 'Displays the git symbols'
     end
     if [ $git_status[1] -gt 0 ]
       set_color -o $capture_colors[12]
-      echo -n ' 落'$git_status[1]' '
+      echo -n ' 󱪟 '$git_status[1]' '
     end
     if [ $git_status[2] -gt 0 ]
       set_color -o $capture_colors[7]
-      echo -n '  '$git_status[2]' '
+      echo -n ' 󱪝 '$git_status[2]' '
     end
     if [ $git_status[3] -gt 0 ]
       set_color -o $capture_colors[10]
