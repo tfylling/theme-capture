@@ -467,27 +467,27 @@ function __capture_prompt_git_symbols -d 'Displays the git symbols'
       set_color -o $capture_colors[5]
       echo -n ' ↓ '$git_ahead_behind[2]' '
     end
-    if [ $git_status[1] -gt 0 ]
+    if [ $git_status[1] -gt 0 ]  # added
       set_color -o $capture_colors[12]
-      echo -n ' 󱪟 '$git_status[1]' '
+      echo -n ' 󱀷 '$git_status[1]' '
     end
-    if [ $git_status[2] -gt 0 ]
+    if [ $git_status[2] -gt 0 ]  # deleted
       set_color -o $capture_colors[7]
-      echo -n ' 󱪝 '$git_status[2]' '
+      echo -n ' 󰻭 '$git_status[2]' '
     end
-    if [ $git_status[3] -gt 0 ]
+    if [ $git_status[3] -gt 0 ]  # modified
       set_color -o $capture_colors[10]
       echo -n '  '$git_status[3]' '
     end
-    if [ $git_status[4] -gt 0 ]
+    if [ $git_status[4] -gt 0 ]  # renamed
       set_color -o $capture_colors[8]
       echo -n ' → '$git_status[4]' '
     end
-    if [ $git_status[5] -gt 0 ]
+    if [ $git_status[5] -gt 0 ]  # unmerged
       set_color -o $capture_colors[9]
       echo -n ' ═ '$git_status[5]' '
     end
-    if [ $git_status[6] -gt 0 ]
+    if [ $git_status[6] -gt 0 ]  # untracked
       set_color -o $capture_colors[4]
       echo -n ' ● '$git_status[6]' '
     end
