@@ -43,13 +43,10 @@ set -U capture_color_fg_git_position $capture_color_palette_black
 set -U capture_color_bg_git_branch $capture_color_palette_river_bed
 set -U capture_color_fg_git_branch $capture_color_palette_silver
 
-set -U capture_night 000000 083743 445659 fdf6e3 2990b5 cb4b16 dc121f af005f 6c71c4 268bd2 2aa198 859900
-#                    0      1      2      3      4      5      6      7      8      9      10     11
-set -U capture_day 000000 333333 666666 ffffff ffff00 ff6600 ff0000 ff0033 3300ff 00aaff 00ffff 00ff00
-if not set -q capture_colors
-  # Values are: black dark_gray light_gray white yellow orange red magenta violet blue cyan green
-  set -U capture_colors $capture_night
-end
+set -U capture_colors     000000 083743 445659 fdf6e3 2990b5 cb4b16 dc121f af005f 6c71c4 268bd2 2aa198 859900
+set -U capture_colors_dim 000000 062932 334143 beb9aa 1f6c88 983811 a50e17 830047 515593 1d689e 207972 647300
+#                         1 1     2      3      4      5      6      7      8      9      10     11     12
+#                         black  dark_gray light_gray white yellow orange red magenta violet blue cyan green
 
 # Cursor color changes according to vi-mode
 # Define values for: normal_mode insert_mode visual_mode
@@ -425,103 +422,204 @@ function __capture_return_code -d 'Displays the return code of the last command'
 end
 
 ################
-# => Git segment
+# => Git segment (staged vs. unstaged, no color reset)
 ################
+
+# ---- Glyphs (override in config.fish if you want) ----
+# Staged = document-ish, Unstaged = box-ish by default
+set -q CAP_GLYPH_GIT      ; or set -g CAP_GLYPH_GIT       ""
+set -q CAP_GLYPH_BRANCH   ; or set -g CAP_GLYPH_BRANCH    ""
+set -q CAP_GLYPH_TAG      ; or set -g CAP_GLYPH_TAG       ""
+set -q CAP_GLYPH_COMMIT   ; or set -g CAP_GLYPH_COMMIT    ""
+
+# staged (index)
+set -q CAP_GLYPH_S_ADD    ; or set -g CAP_GLYPH_S_ADD     "󰝒"
+set -q CAP_GLYPH_S_MOD    ; or set -g CAP_GLYPH_S_MOD     "󱇧"
+set -q CAP_GLYPH_S_DEL    ; or set -g CAP_GLYPH_S_DEL     "󰮘"
+set -q CAP_GLYPH_S_REN    ; or set -g CAP_GLYPH_S_REN     "󱪓"
+
+# unstaged (worktree)
+set -q CAP_GLYPH_S_ADD    ; or set -g CAP_GLYPH_S_ADD     ""
+set -q CAP_GLYPH_W_MOD    ; or set -g CAP_GLYPH_W_MOD     "󱇨"
+set -q CAP_GLYPH_W_DEL    ; or set -g CAP_GLYPH_W_DEL     "󱀷"
+set -q CAP_GLYPH_W_REN    ; or set -g CAP_GLYPH_W_REN     "󱪔"
+
+# misc
+set -q CAP_GLYPH_AHEAD    ; or set -g CAP_GLYPH_AHEAD     ""
+set -q CAP_GLYPH_BEHIND   ; or set -g CAP_GLYPH_BEHIND    ""
+set -q CAP_GLYPH_UNMERGED ; or set -g CAP_GLYPH_UNMERGED  ""
+set -q CAP_GLYPH_UNTRACK  ; or set -g CAP_GLYPH_UNTRACK   ""
+set -q CAP_GLYPH_STASH    ; or set -g CAP_GLYPH_STASH     ""
+
+# Ahead/behind: prints two lines: AHEAD\nBEHIND
 function __capture_is_git_ahead_or_behind -d 'Check if there are unpulled or unpushed commits'
-  if set -l ahead_or_behind (command git rev-list --count --left-right 'HEAD...@{upstream}' 2> /dev/null)
-    echo $ahead_or_behind | sed 's|\s\+|\n|g'
-  else
-    echo 0\n0
-  end
+    set -l ab (command git rev-list --left-right --count @{upstream}...HEAD 2>/dev/null)
+    if test $status -eq 0 -a -n "$ab"
+        set -l parts (string split ' ' -- $ab)
+        echo $parts[2]
+        echo $parts[1]
+    else
+        echo 0
+        echo 0
+    end
 end
 
-function __capture_git_status -d 'Check git status'
-  set -l git_status (command git status --porcelain 2> /dev/null | cut -c 1-2)
-  set -l added (echo -sn $git_status\n | egrep -c "[ACDMT][ MT]|[ACMT]D")
-  set -l deleted (echo -sn $git_status\n | egrep -c "[ ACMRT]D")
-  set -l modified (echo -sn $git_status\n | egrep -c ".[MT]")
-  set -l renamed (echo -sn $git_status\n | egrep -c "R.")
-  set -l unmerged (echo -sn $git_status\n | egrep -c "AA|DD|U.|.U")
-  set -l untracked (echo -sn $git_status\n | egrep -c "\?\?")
-  echo -n $added\n$deleted\n$modified\n$renamed\n$unmerged\n$untracked
+# File status counts (order):
+# 1 s_add  2 s_mod  3 s_del  4 s_ren  5 w_mod  6 w_del  7 w_ren  8 unmerged  9 untracked
+function __capture_git_status -d 'Check git status (staged vs. unstaged)'
+    set -l s_add 0; set -l s_mod 0; set -l s_del 0; set -l s_ren 0
+    set -l w_mod 0; set -l w_del 0; set -l w_ren 0
+    set -l unmerged 0; set -l untracked 0
+
+    for line in (command git status --porcelain=v1 2>/dev/null)
+        # Untracked
+        if string match -rq '^\?\?' -- $line
+            set untracked (math $untracked + 1)
+            continue
+        end
+
+        set -l x (string sub -s 1 -l 1 -- $line)  # index (staged)
+        set -l y (string sub -s 2 -l 1 -- $line)  # worktree (unstaged)
+
+        # Conflicted paths (count once)
+        if test "$x" = U -o "$y" = U; or contains -- "$x$y" AA DD UU AU UA DU UD
+            set unmerged (math $unmerged + 1)
+            continue
+        end
+
+        # Staged (index) side
+        switch $x
+            case A
+                set s_add (math $s_add + 1)
+            case M T
+                set s_mod (math $s_mod + 1)
+            case D
+                set s_del (math $s_del + 1)
+            case R
+                set s_ren (math $s_ren + 1)
+        end
+
+        # Unstaged (worktree) side
+        switch $y
+            case M T
+                set w_mod (math $w_mod + 1)
+            case D
+                set w_del (math $w_del + 1)
+            case R
+                set w_ren (math $w_ren + 1)
+        end
+    end
+
+    echo -n $s_add\n$s_mod\n$s_del\n$s_ren\n$w_mod\n$w_del\n$w_ren\n$unmerged\n$untracked
 end
 
+# Stash count
 function __capture_is_git_stashed -d 'Check if there are stashed commits'
-  command git log --format="%gd" -g $argv 'refs/stash' -- 2> /dev/null | wc -l | tr -d '[:space:]'
+    command git rev-parse --verify --quiet refs/stash >/dev/null 2>&1; or begin
+        echo 0
+        return
+    end
+    command git rev-list --walk-reflogs --count refs/stash 2>/dev/null
 end
 
 function __capture_prompt_git_symbols -d 'Displays the git symbols'
-  set -l is_repo (command git rev-parse --is-inside-work-tree 2> /dev/null)
-  if [ -z $is_repo ]
-    return
-  end
-  set -l git_ahead_behind (__capture_is_git_ahead_or_behind)
-  set -l git_status (__capture_git_status)
-  set -l git_stashed (__capture_is_git_stashed)
-  if [ (expr $git_ahead_behind[1] + $git_ahead_behind[2] + $git_status[1] + $git_status[2] + $git_status[3] + $git_status[4] + $git_status[5] + $git_status[6] + $git_stashed) -ne 0 ]
-    if [ $git_ahead_behind[1] -gt 0 ]
-      set_color -o $capture_colors[5]
-      echo -n ' ↑ '$git_ahead_behind[1]' '
+    command git rev-parse --is-inside-work-tree >/dev/null 2>&1; or return
+
+    set -l git_ahead_behind (__capture_is_git_ahead_or_behind)
+    set -l s ( __capture_git_status )
+    set -l git_stashed (__capture_is_git_stashed)
+
+    if test (math $git_ahead_behind[1] + $git_ahead_behind[2] + $s[1] + $s[2] + $s[3] + $s[4] + $s[5] + $s[6] + $s[7] + $s[8] + $s[9] + $git_stashed) -eq 0
+        echo ' '
+        return
     end
-    if [ $git_ahead_behind[2] -gt 0 ]
-      set_color -o $capture_colors[5]
-      echo -n ' ↓ '$git_ahead_behind[2]' '
+
+    # ahead / behind (leave as-is; you can style these too if you want)
+    if test $git_ahead_behind[1] -gt 0
+        set_color -o $capture_colors[5]
+        echo -n " $CAP_GLYPH_AHEAD $git_ahead_behind[1] "
     end
-    if [ $git_status[1] -gt 0 ]  # added
-      set_color -o $capture_colors[12]
-      echo -n ' 󰻭 '$git_status[1]' '
+    if test $git_ahead_behind[2] -gt 0
+        set_color -o $capture_colors[5]
+        echo -n " $CAP_GLYPH_BEHIND $git_ahead_behind[2] "
     end
-    if [ $git_status[2] -gt 0 ]  # deleted
-      set_color -o $capture_colors[7]
-      echo -n ' 󱀷 '$git_status[2]' '
+
+    # STAGED (bold/bright)
+    if test $s[1] -gt 0  # staged add
+        set_color $capture_colors[12]
+        echo -n " $CAP_GLYPH_S_ADD $s[1] "
     end
-    if [ $git_status[3] -gt 0 ]  # modified
-      set_color -o $capture_colors[10]
-      echo -n '  '$git_status[3]' '
+    if test $s[2] -gt 0  # staged mod
+        set_color $capture_colors[10]
+        echo -n " $CAP_GLYPH_S_MOD $s[2] "
     end
-    if [ $git_status[4] -gt 0 ]  # renamed
-      set_color -o $capture_colors[8]
-      echo -n ' → '$git_status[4]' '
+    if test $s[3] -gt 0  # staged del
+        set_color $capture_colors[7]
+        echo -n " $CAP_GLYPH_S_DEL $s[3] "
     end
-    if [ $git_status[5] -gt 0 ]  # unmerged
-      set_color -o $capture_colors[9]
-      echo -n ' ═ '$git_status[5]' '
+    if test $s[4] -gt 0  # staged ren
+        set_color $capture_colors[8]
+        echo -n " $CAP_GLYPH_S_REN $s[4] "
     end
-    if [ $git_status[6] -gt 0 ]  # untracked
-      set_color -o $capture_colors[4]
-      echo -n ' ● '$git_status[6]' '
+
+    # UNSTAGED (dim/faint)
+    if test $s[5] -gt 0  # unstaged mod
+        set_color $capture_colors_dim[10]
+        echo -n " $CAP_GLYPH_W_MOD $s[5] "
     end
-    if [ $git_stashed -gt 0 ]
-      set_color -o $capture_colors[11]
-      echo -n '  '$git_stashed' '
+    if test $s[6] -gt 0  # unstaged del
+        set_color $capture_colors_dim[7]
+        echo -n " $CAP_GLYPH_W_DEL $s[6] "
     end
-  end
-  echo ' '
+    if test $s[7] -gt 0  # unstaged ren
+        set_color $capture_colors_dim[8]
+        echo -n " $CAP_GLYPH_W_REN $s[7] "
+    end
+
+    # other (unchanged intensity; tweak if you want)
+    if test $s[8] -gt 0  # unmerged
+        set_color -o $capture_colors[9]
+        echo -n " $CAP_GLYPH_UNMERGED $s[8] "
+    end
+    if test $s[9] -gt 0  # untracked
+        set_color -o $capture_colors[4]
+        echo -n " $CAP_GLYPH_UNTRACK $s[9] "
+    end
+    if test $git_stashed -gt 0
+        set_color -o $capture_colors[11]
+        echo -n " $CAP_GLYPH_STASH $git_stashed "
+    end
+
+    echo ' '
 end
 
+# Branch/position/commit label, then symbols; no color reset
 function __capture_prompt_git_branch -d 'Return the current branch name'
-  set -l branch (command git symbolic-ref HEAD 2> /dev/null | sed -e 's|^refs/heads/||')
-  if not test $branch > /dev/null
-    set -l position (command git describe --contains --all HEAD 2> /dev/null)
-    if not test $position > /dev/null
-      set -l commit (command git rev-parse HEAD 2> /dev/null | sed 's|\(^.......\).*|\1|')
-      if test $commit
-        set -g capture_color_bg_next $capture_color_bg_git_commit
-        set_color $capture_color_fg_git_commit
-        echo -n '  ➦ '$commit
-      end
+    command git rev-parse --is-inside-work-tree >/dev/null 2>&1; or return
+
+    set -l branch (command git symbolic-ref --quiet --short HEAD 2>/dev/null)
+    if test -n "$branch"
+        set -g capture_color_bg_next $capture_color_bg_git_branch
+        set_color $capture_color_fg_git_branch
+        echo -n " $CAP_GLYPH_GIT $CAP_GLYPH_BRANCH $branch"
     else
-      set -g capture_color_bg_next $capture_color_bg_git_position
-      set_color $capture_color_fg_git_position
-      set -l position (echo -n $position | sed -e 's|tags/| |')
-      echo -n '  '$position
+        set -l position (command git describe --contains --all HEAD 2>/dev/null)
+        if test -n "$position"
+            set -g capture_color_bg_next $capture_color_bg_git_position
+            set_color $capture_color_fg_git_position
+            set -l pretty (string replace -r '^tags/' "$CAP_GLYPH_TAG " -- $position)
+            echo -n " $CAP_GLYPH_GIT $pretty"
+        else
+            set -l commit (command git rev-parse --short=7 HEAD 2>/dev/null)
+            if test -n "$commit"
+                set -g capture_color_bg_next $capture_color_bg_git_commit
+                set_color $capture_color_fg_git_commit
+                echo -n " $CAP_GLYPH_GIT $CAP_GLYPH_COMMIT $commit"
+            end
+        end
     end
-  else
-    set -g capture_color_bg_next $capture_color_bg_git_branch
-    set_color $capture_color_fg_git_branch
-    echo -n '   '$branch
-  end
-  __capture_prompt_git_symbols
+
+    __capture_prompt_git_symbols
 end
 
 ###############
