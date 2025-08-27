@@ -31,6 +31,7 @@ set -U capture_color_palette_fun_green 006d4a
 set -U capture_color_palette_crusoe 004d00
 set -U capture_color_palette_jungle_green 2aa198
 set -U capture_color_palette_river_bed 445659
+set -U capture_color_palette_river_bed_dim 334143 #334143 #233437
 set -U capture_color_palette_bahama_blue 006d8f
 set -U capture_color_palette_regal_blue 004b6e
 set -U capture_color_palette_blue_marguerite 6c71c4
@@ -42,6 +43,7 @@ set -U capture_color_bg_git_position $capture_color_palette_blue_marguerite
 set -U capture_color_fg_git_position $capture_color_palette_black
 set -U capture_color_bg_git_branch $capture_color_palette_river_bed
 set -U capture_color_fg_git_branch $capture_color_palette_silver
+set -U capture_color_bg_git_branch_dim $capture_color_palette_river_bed_dim
 
 set -U capture_colors     000000 083743 445659 fdf6e3 2990b5 cb4b16 dc121f af005f 6c71c4 268bd2 2aa198 859900
 set -U capture_colors_dim 000000 062932 334143 beb9aa 1f6c88 983811 a50e17 830047 515593 1d689e 207972 647300
@@ -422,7 +424,7 @@ function __capture_return_code -d 'Displays the return code of the last command'
 end
 
 ################
-# => Git segment (staged vs. unstaged, no color reset)
+# => Git segment
 ################
 
 # ---- Glyphs (override in config.fish if you want) ----
@@ -544,6 +546,7 @@ function __capture_prompt_git_symbols -d 'Displays the git symbols'
         echo -n " $CAP_GLYPH_BEHIND $git_ahead_behind[2] "
     end
 
+
     # STAGED (bold/bright)
     if test $s[1] -gt 0  # staged add
         set_color $capture_colors[12]
@@ -562,32 +565,37 @@ function __capture_prompt_git_symbols -d 'Displays the git symbols'
         echo -n " $CAP_GLYPH_S_REN $s[4] "
     end
 
-    # UNSTAGED (dim/faint)
-    if test $s[5] -gt 0  # unstaged mod
-        set_color $capture_colors_dim[10]
-        echo -n " $CAP_GLYPH_W_MOD $s[5] "
-    end
-    if test $s[6] -gt 0  # unstaged del
-        set_color $capture_colors_dim[7]
-        echo -n " $CAP_GLYPH_W_DEL $s[6] "
-    end
-    if test $s[7] -gt 0  # unstaged ren
-        set_color $capture_colors_dim[8]
-        echo -n " $CAP_GLYPH_W_REN $s[7] "
-    end
+    if test (math $s[5] + $s[6] + $s[7] + $s[8] + $s[9] + $git_stashed) -ne 0
+      set_color $capture_color_bg_git_branch_dim
+      echo -n ''
+      set_color -b $capture_color_bg_git_branch_dim
+      # UNSTAGED (dim/faint)
+      if test $s[5] -gt 0  # unstaged mod
+          set_color $capture_colors_dim[10]
+          echo -n " $CAP_GLYPH_W_MOD $s[5] "
+      end
+      if test $s[6] -gt 0  # unstaged del
+          set_color $capture_colors_dim[7]
+          echo -n " $CAP_GLYPH_W_DEL $s[6] "
+      end
+      if test $s[7] -gt 0  # unstaged ren
+          set_color $capture_colors_dim[8]
+          echo -n " $CAP_GLYPH_W_REN $s[7] "
+      end
 
-    # other (unchanged intensity; tweak if you want)
-    if test $s[8] -gt 0  # unmerged
-        set_color -o $capture_colors[9]
-        echo -n " $CAP_GLYPH_UNMERGED $s[8] "
-    end
-    if test $s[9] -gt 0  # untracked
-        set_color -o $capture_colors[4]
-        echo -n " $CAP_GLYPH_UNTRACK $s[9] "
-    end
-    if test $git_stashed -gt 0
-        set_color -o $capture_colors[11]
-        echo -n " $CAP_GLYPH_STASH $git_stashed "
+      # other (unchanged intensity; tweak if you want)
+      if test $s[8] -gt 0  # unmerged
+          set_color -o $capture_colors[9]
+          echo -n " $CAP_GLYPH_UNMERGED $s[8] "
+      end
+      if test $s[9] -gt 0  # untracked
+          set_color -o $capture_colors[4]
+          echo -n " $CAP_GLYPH_UNTRACK $s[9] "
+      end
+      if test $git_stashed -gt 0
+          set_color -o $capture_colors[11]
+          echo -n " $CAP_GLYPH_STASH $git_stashed "
+      end
     end
 
     echo ' '
