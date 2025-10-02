@@ -457,14 +457,19 @@ set -q CAP_GLYPH_STASH    ; or set -g CAP_GLYPH_STASH     ""
 function __capture_is_git_ahead_or_behind -d 'Check if there are unpulled or unpushed commits'
     set -l ab (command git rev-list --left-right --count @{upstream}...HEAD 2>/dev/null)
     if test $status -eq 0 -a -n "$ab"
-        # ab is "BEHIND<TAB>AHEAD" — split on any whitespace
-        set -l fields (string split --regex '\s+' -- $ab)
+        # Git returns "BEHIND<TAB>AHEAD" — split on tab first, then fall back to space.
+        set -l fields (string split \t -- $ab)
+        if test (count $fields) -lt 2
+            set fields (string split ' ' -- $ab)
+        end
+
         set -l behind 0
         set -l ahead  0
         if test (count $fields) -ge 2
             set behind $fields[1]
             set ahead  $fields[2]
         end
+
         printf "%s\n%s\n" $ahead $behind
     else
         printf "0\n0\n"
